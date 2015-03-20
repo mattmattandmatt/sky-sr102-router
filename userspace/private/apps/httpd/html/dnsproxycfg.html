@@ -1,0 +1,127 @@
+<html>
+   <head>
+      <meta HTTP-EQUIV='Pragma' CONTENT='no-cache'>
+      <link rel="stylesheet" href='stylemain.css' type='text/css'>
+         <link rel="stylesheet" href='colors.css' type='text/css'>
+            <script language="javascript" src="util.js"></script>
+            <script language="javascript">
+<!-- hide
+
+function dproxyClick(cb) {
+   if ( cb.checked == true )
+      hideNameInfo(0);
+   else
+      hideNameInfo(1);
+}
+   
+function hideNameInfo(hide) {
+   var status = 'visible';
+
+   if ( hide == 1 )
+      status = 'hidden';
+   if (document.getElementById)  // DOM3 = IE5, NS6
+      document.getElementById('hideinfo').style.visibility = status;
+   else {
+      if (document.layers == false) // IE4
+         document.all.hideinfo.style.visibility = status;
+   }
+}
+
+
+function btnApplySave() {
+   var loc = 'dnsProxy.cmd?';
+
+   with ( document.forms[0] ) {
+     if (chkdproxy.checked == true)
+        loc += 'enblDproxy=1';
+     else
+        loc += 'enblDproxy=0';
+
+     if (chkdproxy.checked == true && hostname.value == '')
+     {
+        alert('Please enter the host name!!');
+        return;
+     }
+     else
+        loc += '&hostname=' + hostname.value;
+
+     if (chkdproxy.checked == true && domainname.value == '')
+     {
+        alert('Please enter the domain name!!');
+        return;
+     }
+     else
+        loc += '&domainname=' + domainname.value;
+	 
+   }
+   loc += '&sessionKey=<%ejGetOther(sessionKey)%>';
+   var code = 'location="' + loc + '"';
+   eval(code);
+}
+
+
+function frmLoad() {
+   with ( document.forms[0] ) {
+      var dproxyInfo = '';
+      dproxyInfo = '<%ejGetOther(dnsProxy)%>';
+      var dproxy = dproxyInfo.split('|');
+
+      if (dproxy[0] == 1)
+      {
+         chkdproxy.checked = true;
+         hideNameInfo(0);
+      }
+      else 
+      {
+         chkdproxy.checked = false;
+         hideNameInfo(1);
+      }
+
+      hostname.value = dproxy[1];
+      domainname.value = dproxy[2];
+
+   }
+}
+
+// done hiding -->
+</script>
+   </head>
+   <body onLoad='frmLoad()'>
+      <blockquote>
+         <form>
+            <P>
+               <b>DNS Proxy Configuration</b> &nbsp; (Changing the name may cause issues)<br><br>
+            </P>
+
+            <tr>
+               <td colspan="2">
+                  <input type='checkbox' name='chkdproxy' onClick='dproxyClick(this)'></td>
+               <td>
+                    Enable DNS Proxy</td>
+            </tr>
+
+            <br>
+            <br>
+            <div id='hideinfo'>               
+               <table>
+               <tr>
+                  <td>Host name of the Broadband Router:</td>
+                  <td><input type='text' name='hostname'></td>
+               </tr>
+               <tr>
+                  <td>Domain name of the LAN network:</td>
+                  <td><input type='text' name='domainname'></td>
+               </tr>
+               </table>
+            </div>            
+            <br>
+            <br>
+            <center>
+               <input type='button' onClick='btnApplySave()' value='Apply/Save'>
+            </center>
+         </form>
+      </blockquote>
+   </body>
+</html>
+
+

@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- v4.2 -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Sky Hub &gt; UPnP</title>
+<link type="text/css" rel="stylesheet" href="assets/css/fonts.css"/>
+<link type="text/css" rel="stylesheet" href="assets/css/main.css"/>
+<!-- jh scripts start -->
+<script type="text/javascript" src="assets/js/libs/jquery/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="assets/js/libs/jquery/jquery.effects.core.js"></script>
+<!--[if LT IE 7]>
+			<script type="text/javascript" src="assets/js/libs/DD_belatedPNG_0.0.8a.js"></script>
+		<![endif]-->
+<script type="text/javascript" src="assets/js/utilities.js"></script>
+<script type="text/javascript" src="assets/js/libs/modernizr.touch.js"></script>
+<script type="text/javascript" src="assets/js/init.js"></script>
+<!-- jh scripts end -->
+<script type="text/javascript" src="assets/js/sky_utility.js"></script>
+<script type="text/javascript" src="assets/js/sky_linux.js"></script>
+<script type="text/javascript" src="assets/js/sky_script.js"></script>
+<script type="text/javascript">
+     <!--//
+	 var if_allow_submit=false;
+	  
+function trim(vString)
+{  
+	var tString = vString;
+
+	//trim left spaces
+	if (tString.charAt(0) == " ")
+		tString = trim(tString.substring(1, tString.length));
+
+	//trim right spaces
+	if (tString.charAt(tString.length-1) == " ")
+		tString = trim(tString.substring(0, tString.length-1))
+
+	return(tString);
+}
+function isNumOnly(vString)
+{
+	var NUMBERS = "0123456789";
+	var valid = true;
+	for(var i=0;i<vString.length;i++)
+		if(NUMBERS.indexOf(vString.charAt(i))<0)
+			valid = false;
+			
+	return(valid);
+}
+function isNull(vField) {
+	var ret = false
+	vField.value = trim(vField.value)
+	
+	if (vField.value.length == 0)
+		ret = true
+	return(ret)
+}
+function CheckAdverTimeVal(vField)
+{
+	if(isNull(vField)){
+		alert(vField.name + " cannot be empty!")
+	//	vField.value = vField.form.hiddenAdverTime.value
+		vField.focus()
+		return; 
+	}
+	if(!isNumOnly(vField.value)){
+		alert(vField.name + " must be numeric!")
+	//	vField.value = vField.form.hiddenAdverTime.value
+		vField.focus()
+		return ;	
+	}
+	if((vField.value >1440 )||(vField.value <= 0 )){
+		alert(vField.name + " must be greater than 0 and less than or equal to 1440 minutes! ")
+	//	vField.value = vField.form.hiddenAdverTime.value
+		vField.focus()
+		return ; 
+	}	
+	return true
+}
+function CheckTimeToLiveVal(vField)
+{
+	if(isNull(vField)){
+		alert(vField.name + " cannot be empty!")
+	//	vField.value = vField.form.hiddenTimeToLive.value
+		vField.focus()
+		return; 
+	}
+	if(!isNumOnly(vField.value)){
+		alert(vField.name + " must be numeric!")
+	//	vField.value = vField.form.hiddenTimeToLive.value
+		vField.focus()
+		return ;	
+	}
+	if((vField.value > 255 )||(vField.value <= 0 )){
+		alert(vField.name + " must be greater than 0 and less than or equal to 255 ")
+	//	vField.value = vField.form.hiddenTimeToLive.value
+		vField.focus()
+		return ; 
+	}
+	return true
+}
+
+function finishcheck()
+{
+	if (if_allow_submit==false)	
+		return ;
+
+ 	var cf = document.forms[0];
+	if(!CheckAdverTimeVal(cf.upnpAdvTime))
+		return ;
+	else if(!CheckTimeToLiveVal(cf.upnpAdvTTL))
+		return ;
+	else 
+	{
+		dataToHidden(cf);
+		cf.submit();
+		return true;
+	}
+}
+
+var tIdx='<%ejGet(h_tableIndex)%>';
+
+
+//Function to reach next index
+function goNext(){
+
+if(document.getElementById('tableupnp').getElementsByTagName('tr').length >=20) {
+tIdx++;
+}
+// reload the page with appending URL having index.
+window.location= "?h_tableIndex" + "=" + tIdx;
+}
+
+
+//Function to reach prev index
+function goPrev() {
+
+if((document.getElementById('tableupnp').getElementsByTagName('tr').length > 20) && (tIdx!=1) ) {
+    tIdx--;
+}
+else if ((document.getElementById('tableupnp').getElementsByTagName('tr').length < 20) && (tIdx >=2)){
+    tIdx--;  
+}
+else {
+  //don't do anything.
+}
+// reload the page with appending URL having index.
+window.location="?h_tableIndex=" + tIdx;
+}
+
+//function to enable/disable button based on idx
+function enable_disable_btn()
+{
+	//
+   if(document.getElementById('tableupnp').getElementsByTagName('tr').length > 20 ) {
+       document.getElementById("next_btn_idx").disabled = false;
+	   document.getElementById("back_btn_idx").disabled = false;
+   }
+   else if((document.getElementById('tableupnp').getElementsByTagName('tr').length < 20) && tIdx >1)
+   {
+       document.getElementById("next_btn_idx").disabled = false;
+	   document.getElementById("back_btn_idx").disabled = false;
+   }
+   else
+   {
+	$("#next_btn_idx").removeAttr('href');
+	$("#back_btn_idx").removeAttr('href');
+//       document.getElementById("next_btn_idx").disabled = true;
+//	   document.getElementById("back_btn_idx").disabled = true;
+   }
+}
+
+     //-->
+   </script>
+</head>
+<body onload="dataToVisible(document.forms[0]);enable_disable_btn();loadhelp('_upnp')">
+<!-- head -->
+<div id="head">
+  <div id="header">
+    <div class="layout"><span id="header-title"><a href="sky_index.html">Sky Hub</a></span><img src="assets/images/sky_logo.png" width="83" height="51" id="header-logo"/> </div>
+  </div>
+  <!-- nav -->
+  <div id="nav">
+    <div id="main-nav">
+      <div class="layout">
+        <ul id="topmenu">
+          <li><a id="wireless" href="sky_wireless_settings.html">Wireless</a></li>
+          <li><a id="security" href="sky_logs.html">Security</a></li>
+          <li><a id="maintenance" href="sky_router_status.html">Maintenance</a></li>
+          <li class="selected"><a id="advanced" href="sky_wan_setup.html">Advanced</a></li>
+          <li><a id="support" href="sky_support.html">Support</a></li>
+		  <li><a id="licence" href="sky_license.html">Licensing Information</a></li>
+        </ul>
+        <a id="logout" href="sky_logout.html">Logout</a> </div>
+    </div>
+    <div id="sub-nav">
+      <div class="layout">
+        <ul id="submenu-wireless">
+          <li><a href="sky_wireless_settings.html">Wireless Settings</a></li>
+          <li><a href="sky_wireless_wps.html">Wireless WPS</a></li>
+        </ul>
+        <ul id="submenu-security">
+          <li><a href="sky_logs.html">Logs</a></li>
+          <li><a href="sky_block_sites.html">Block Sites</a></li>
+          <li><a href="sky_firewall_rules.html">Firewall Rules</a></li>
+          <li><a href="sky_services.html">Services</a></li>
+          <li><a href="sky_schedule.html">Schedule</a></li>
+        </ul>
+        <ul id="submenu-maintenance">
+          <li><a href="sky_router_status.html">Router Status</a></li>
+          <li><a href="sky_attached_devices.html">Attached Devices</a></li>
+          <li><a href="sky_backup_settings.html">Backup Settings</a></li>
+          <li><a href="sky_set_password.html">Set Password</a></li>
+          <li><a href="sky_diagnostics.html">Diagnostics</a></li>
+          <li><a href="sky_router_upgrade.html">Router Upgrade</a></li>
+        </ul>
+        <ul id="submenu-advanced" class="selected">
+          <li><a href="sky_wan_setup.html">WAN Setup</a></li>
+          <li><a href="sky_dynamic_dns.html">Dynamic DNS</a></li>
+          <li><a href="sky_lan_ip_setup.html">LAN IP Setup</a></li>
+          <li><a href="sky_remote_management.html">Remote Management</a></li>
+          <li class="selected"><a href="sky_upnp.html">UPnP</a></li>
+          <li><a href="sky_adv_extras.html">Extras</a></li>
+        </ul>
+        <ul id="submenu-support">
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- nav end -->
+</div>
+<!-- head end -->
+<!-- content -->
+<div id="content">
+  <!-- layout -->
+  <div class="layout">
+  	 <form name="formname" method="post" action="sky_upnp.cgi" onsubmit="return finishcheck();">
+    <div id="content-header">
+      <div id="content-header-copy">
+        <h1>UPnP</h1>
+        <p class="black">Universal Plug and Play (UPnP) helps devices  access the network and connect to other devices as needed.</p>
+        <p>UPnP devices can automatically discover the services from other registered UPnP devices on the network.</p>
+      </div>
+      <div id="content-header-image"></div>
+      <br class="clear-break" />
+    </div>
+    <div id="content-body">
+      <!-- main-panel -->
+      <div class="main-panel">
+        <hr class="top" />
+        <div class="row-holder">
+          <input checked="checked" name="enblUpnp" type="checkbox"/>
+          <label class="right">Turn UPnP On</label>
+          <a class="help-btn" href="#" name="help1">help</a> </div>
+        <div class="row-holder">
+          <label class="w250">Advertisement Period</a> (in minutes):</label>
+          <input name="upnpAdvTime" size="4" maxlength="4" value="<%ejGet(upnpAdvTime)%>" onfocus="this.select();" type="text"/>
+        </div>
+        <div class="row-holder">
+          <label class="w250">Advertisement Time To Live</a> (in hops):</label>
+          <input name="upnpAdvTTL" size="4" maxlength="3" value="<%ejGet(upnpAdvTTL)%>" onfocus="this.select();" type="text"/>
+        </div>
+        <hr />
+        <div class="section-heading">
+          <h3>UPnP Portmap Table</h3>
+          <a class="help-btn" href="#" name="help2">help</a></div>
+        <%ejGet(UpnpPortMaptable)%>
+	
+		    <div class="row-holder"> <span class="label w250">Total Entry:</span>  
+			<span> <%ejGet(h_totalEntry)%></span> </div>
+
+        <table class="nospace" id="tableupnp" width="650" border="0" cellpadding="0" cellspacing="0">
+          <tbody>
+            <tr class="header">
+			  <td width="10%">Index</td>
+              <td width="10%">Active</td>
+              <td width="15%">Protocol</td>
+              <td width="15%">Int. Port</td>
+              <td width="15%">Ext. Port</td>
+              <td>IP Address</td>
+            </tr>
+            <%ejGet(upnpPortMap)%>
+          </tbody>
+        </table>
+        <div  class="buttons-holder"><a href="javascript: if_allow_submit=true; document.forms[0].todo.value='refresh';location.reload(true); "class="btn32 btn-silver png"><span class="png">Refresh</span></a><a href="javascript: if_allow_submit=true; document.forms[0].todo.value='back';goPrev();" {if_allow_setupnp}="" id="back_btn_idx" class="btn32 btn-pink png" ><span class="png">Back</span></a> <a href="javascript: if_allow_submit=true; document.forms[0].todo.value='next';goNext();" {if_allow_setupnp}="" id="next_btn_idx" class="btn32 btn-pink png"><span class="png">Next</span></a> </div>
+        <input name="sessionKey" value="<%ejGetOther(sessionKey)%>" type="hidden"/>
+        <input name="todo" value="save" type="hidden"/>
+        <input name="this_file" value="sky_upnp.html" type="hidden"/>
+        <input name="next_file" value="sky_upnp.html" type="hidden"/>
+        <!-- ServerStart -->
+        <input name="h_enblUpnp" value="<%ejGet(h_enblUpnp)%>" type="hidden"/>
+        <!-- ServerEnd -->
+        <hr />
+        <div class="buttons-holder"><a href="javascript: if_allow_submit=true; document.forms[0].todo.value='cancel';location.reload(true);" class="btn42 btn-silver png"><span class="png">Cancel</span></a> <a href="javascript: if_allow_submit=true; document.forms[0].todo.value='apply';finishcheck();" {if_allow_setupnp}="" class="btn42 btn-pink png"><span class="png">Apply</span></a></div>
+      </div>
+      <!-- main-panel end -->
+      <!-- side-panel -->
+      <div class="side-panel">
+        <!-- HELP 1 -->
+        <div class="pod pod-help" id="help1"><a href="#close" class="help-close"></a>
+          <div class="content">
+            <h3>Turn UPnP On</h3>
+            <p>UPnP can be enabled or disabled for automatic device configuration. The default setting for UPnP is enabled. If disabled, the Sky Hub will not allow any device to automatically control the resources, such as port forwarding (mapping), of your Sky Hub.</p>
+            <ul>
+              <li>Select <b>Apply</b> to save the new settings to your Sky Hub</li>
+              <li>Select <b>Cancel</b> to disregard any unsaved changes.</li>
+            </ul>
+            <h3>Advertisement Period</h3>
+            <p>The Advertisement Period is how often the Sky Hub will advertise (broadcast) its UPnP information. This value can range from 1 to 1440 minutes. The default period is for 30 minutes. Shorter durations will ensure that control points have current device status at the expense of additional network traffic. Longer durations may compromise the freshness of the device status but can significantly reduce network traffic.</p>
+            <h3>Advertisement Time To Live</h3>
+            <p>The time to live for the advertisement is measured in hops (steps) for each UPnP packet sent. A hop is the number of steps allowed to propagate for each UPnP advertisement before it disappears. The number of hops can range from 1 to 255. The default value for the advertisement time to live is four hops, which should be fine for most home networks. If you notice that some devices aren't being updated or reached correctly, then it may be necessary to increase this value.</p>
+          </div>
+          <span class="arrow arrow-l png"></span> </div>
+        <!-- HELP 2 -->
+        <div class="pod pod-help" id="help2"><a href="#close" class="help-close"></a>
+          <div class="content">
+            <h3>UPnP Portmap Table</h3>
+            <p>The UPnP Portmap Table displays the IP address of each UPnP device that is currently accessing the Sky Hub and which ports,(Internal and External, that connecting device has opened. The UPnP Portmap Table also displays what type of port is opened and if that port is still active for each IP address.</p>
+            <ul>
+              <li>Select <b>Refresh</b> to update the Portmap table and to show the active ports that are currently opened by UPnP devices</li>
+            </ul>
+          </div>
+          <span class="arrow arrow-l png"></span> </div>
+      </div>
+      <!-- side-panel end -->
+      <br class="clear-break" />
+    </div>
+	</form>
+  </div>
+  <!-- layout end -->
+</div>
+<!-- content end -->
+</div>
+</body>
+</html>

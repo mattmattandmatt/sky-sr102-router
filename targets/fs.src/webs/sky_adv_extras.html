@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<html class="sIFR-hasFlash" xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Sky Hub &gt; Extras</title>
+<link type="text/css" rel="stylesheet" href="assets/css/fonts.css">
+<link type="text/css" rel="stylesheet" href="assets/css/main.css">
+<script type="text/javascript" src="assets/js/libs/jquery/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="assets/js/libs/jquery/jquery.effects.core.js"></script>
+<!--[if LT IE 7]>
+	<script type="text/javascript" src="assets/js/libs/DD_belatedPNG_0.0.8a.js"></script>
+<![endif]-->
+<script type="text/javascript" src="assets/js/utilities.js"></script>
+<script type="text/javascript" src="assets/js/libs/modernizr.touch.js"></script>
+<script type="text/javascript" src="assets/js/init.js"></script>
+<script type="text/javascript" src="assets/js/sky_utility.js"></script>
+<script type="text/javascript" src="assets/js/sky_linux.js"></script>
+<script type="text/javascript" src="assets/js/sky_script.js"></script>
+</head>
+<body>
+<div id="head">
+  <div id="header">
+    <div class="layout"><span id="header-title"><a href="sky_index.html">Sky Hub</a></span><img src="assets/images/sky_logo.png" id="header-logo" height="51" width="83"> </div>
+  </div>
+  <!-- nav -->
+  <div id="nav">
+    <div id="main-nav">
+      <div class="layout">
+        <ul id="topmenu">
+          <li><a id="wireless" href="sky_wireless_settings.html">Wireless</a></li>
+          <li><a id="security" href="sky_logs.html">Security</a></li>
+          <li><a id="maintenance" href="sky_router_status.html">Maintenance</a></li>
+          <li class="selected"><a id="advanced" href="sky_wan_setup.html">Advanced</a></li>
+          <li><a id="support" href="sky_support.html">Support</a></li>
+           <li><a id="licence" href="sky_license.html">Licensing Information</a></li>
+        </ul>
+        <a id="logout" href="sky_logout.html">Logout</a> </div>
+    </div>
+    <div id="sub-nav">
+      <div class="layout">
+        <ul id="submenu-wireless">
+          <li><a href="sky_wireless_settings.html">Wireless Settings</a></li>
+          <li><a href="sky_wireless_wps.html">Wireless WPS</a></li>
+        </ul>
+        <ul id="submenu-security">
+          <li><a href="sky_logs.html">Logs</a></li>
+          <li><a href="sky_block_sites.html">Block Sites</a></li>
+          <li><a href="sky_firewall_rules.html">Firewall Rules</a></li>
+          <li><a href="sky_services.html">Services</a></li>
+          <li><a href="sky_schedule.html">Schedule</a></li>
+        </ul>
+        <ul id="submenu-maintenance">
+          <li><a href="sky_router_status.html">Router Status</a></li>
+          <li><a href="sky_attached_devices.html">Attached Devices</a></li>
+          <li><a href="sky_backup_settings.html">Backup Settings</a></li>
+          <li><a href="sky_set_password.html">Set Password</a></li>
+          <li><a href="sky_diagnostics.html">Diagnostics</a></li>
+          <li><a href="sky_router_upgrade.html">Router Upgrade</a></li>
+        </ul>
+        <ul id="submenu-advanced" class="selected">
+          <li><a href="sky_wan_setup.html">WAN Setup</a></li>
+          <li><a href="sky_dynamic_dns.html">Dynamic DNS</a></li>
+          <li><a href="sky_lan_ip_setup.html">LAN IP Setup</a></li>
+          <li><a href="sky_remote_management.html">Remote Management</a></li>
+          <li><a href="sky_upnp.html">UPnP</a></li>
+          <li class="selected"><a href="sky_adv_extras.html">Extras</a></li>
+        </ul>
+        <ul id="submenu-support">
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- nav end -->
+</div>
+<!-- content -->
+<div id="content">
+  <!-- layout -->
+  <div class="layout">
+    <div id="content-header">
+      <div id="content-header-copy">
+        <h1>Change xDSL Line ID</h1>
+		<form id="frmdslid" method="post" action="" target="dsldetails">
+		<input name="action" value="getids" type="hidden"></form>
+		<iframe src="" seamless border="0" name="dsldetails" height="200" width="365"></iframe>
+		<p>I'm sorry, but you need to <a href="sky_diagnostics.html">reboot</a> for the changes to take affect</p>
+        <p>After changing the values, check your speed and service provider name:</p>
+		<p><a href="http://www.speedtest.net">http://www.speedtest.net</a></p>
+		<p><a href="http://www.broadbandspeedchecker.co.uk">http://www.broadbandspeedchecker.co.uk</a></p>
+		<p>( Uses PPP, ATM - PVC:0/38 )</a>
+		<br><br>
+        <h1>Other Configuration Menu</h1>
+        <p>Some of these are advanced features, and some do not work.</p>
+        <a href="main.html"><p class="black">&gt; Main Broadcom Configuration &lt;</p></a>
+		<br><br>
+        <h3>Some of the Links on the above menu</h3>
+		<a href="wancfg.html"><p class="black">&gt; WAN IP Config</p></a>
+		<a href="ipsconfig.html"><p class="black">&gt; IPsec Config</p></a>
+		<a href="ipv6lancfg.html"><p class="black">&gt; IP6 Config</p></a>
+        <a href="pppoe.html"><p class="black">&gt; Change the PPP Username / Password (Can't get working)</p></a>
+		<br>
+        <a href="adslcfg.html"><p class="black">&gt; DSL Modulation Type</p></a>
+        <a href="adslcfgadv.html"><p class="black">&gt; DSL Modulation Test</p></a>
+        <a href="adslcfgtone.html"><p class="black">&gt; DSL Tone Test</p></a>
+        <a href="berstart.html"><p class="black">&gt; Bit Error Rate Test</p></a>
+		<br>
+        <a href="dslbondingcfg.html"><p class="black">&gt; DSL Bonding Capability</p></a>
+        <a href="enblbridge.html"><p class="black">&gt; Enable/Disable Bridging</p></a>
+        <a href="enblservice.html"><p class="black">&gt; Enable/Disable IGMP</p></a>
+		<br>
+        <a href="cfgatm.html"><p class="black">&gt; ATM PVC Config</p></a>
+        <a href="cfgeth.html"><p class="black">&gt; Ethernet WAN Port Config</p></a>
+        <a href="cfgepon.html"><p class="black">&gt; EPON WAN Port Config</p></a>
+        <a href="cfggpon.html"><p class="black">&gt; GPON WAN Port Config</p></a>
+        <a href="cfgmoca.html"><p class="black">&gt; MoCA WAN Port Config</p></a>
+		<br>
+        <a href="cfgl2tpac.html"><p class="black">&gt; Add L2TP PPP Connection</p></a>
+        <a href="cfgptm.html"><p class="black">&gt; PTM Config</p></a>
+		<br>
+        <a href="diagmer.html"><p class="black">&gt; Port Connection Diagnostics &amp; DSL</p></a>
+        <a href="diagpppoa.html"><p class="black">&gt; Port Diagnostics &amp; PPPoa</p></a>
+        <a href="diagpppoe.html"><p class="black">&gt; Port Diagnostics &amp; PPPoe</p></a>
+        <a href="diag8021ag.html"><p class="black">&gt; 802.1ag Connectivity Fault Mgmt</p></a>
+        <a href="hlpusbconn.html"><p class="black">&gt; USB Test (does not work)</p></a>
+		<br>
+        <a href="engdebug.html"><p class="black">&gt; Port Mirroring</p></a>
+		<br>
+        <a href="dnscfg.html"><p class="black">&gt; DNS Server Config 1</p></a>
+        <a href="ifcdns.html"><p class="black">&gt; DNS Server Config 2</p></a>
+        <a href="dnsproxycfg.html"><p class="black">&gt; DNS Proxy Config</p></a>
+        <a href="ifcgateway.html"><p class="black">&gt; Default Gateway</p></a>
+		<br>
+        <a href="dlnacfg.html"><p class="black">&gt; DLNA Media Server Config</p></a>
+		<br>
+        <a href="certadd.html"><p class="black">&gt; Add new Certificate</p></a>
+        <a href="certcaimport.html"><p class="black">&gt; Import CA Certificate</p></a>
+        <a href="certimport.html"><p class="black">&gt; Import Normal Certificate</p></a>
+        <a href="certloadsigned.html"><p class="black">&gt; Load Certificate</p></a>
+      </div>
+        <img src="assets/images/diagram_vdsl.jpg" height="200px" width="328px">
+      <br class="clear-break">
+    </div>
+  </div>
+  <!-- layout end -->
+</div><script>
+window.open('', 'dsldetails');
+document.getElementById('frmdslid').action='http://'+window.location.host+':8080';
+document.getElementById('frmdslid').submit();
+</script></body></html>

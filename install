@@ -1,0 +1,61 @@
+#!/bin/bash
+
+single_dir=sky-sr102-router-master
+master_dir=`pwd`/$single_dir
+
+
+
+echo ""
+echo "###################################################################"
+echo "# Downloading and Installing Custom Firmware for the SR102 Router #"
+echo "###################################################################"
+
+echo ""
+echo "Downloading original Source..."
+echo ""
+wget http://oss.sky.com/SkyHD/SKY-IHR-2-1-s-3761-R-consumer-release.tar.gz
+
+
+echo ""
+echo "Unpacking..."
+echo ""
+tar -xf SKY-IHR-2-1-s-3761-R-consumer-release.tar.gz
+mkdir -p $master_dir
+cd $master_dir
+tar -xf ../SKY-IHR-2-1-r--R-source.tar.gz
+cd ..
+
+
+echo ""
+echo "Downloading Patches..."
+echo ""
+wget http://github.com/mattmattandmatt/sky-sr102-router/archive/master.zip -O SR102-patches.zip
+
+echo ""
+echo "Unpacking..."
+echo ""
+unzip -o SR102-patches.zip
+
+echo ""
+echo "Applying UnionFS..."
+echo ""
+cd $master_dir/kernel/linux
+patch -r $master_dir/patch.errors -p1 < $master_dir/unionfs-2.6_for_2.6.30.10.diff
+
+chmod -R a+wrx $master_dir/*
+
+
+echo ""
+echo "*** Last part, Root is required to copy the MIPS Toolchain 4.4.2 ***"
+echo "***      in /opt/toolchains/uclibc-crosstools-gcc-4.4.2-1/       ***"
+echo ""
+cd /
+sudo tar -xf $master_dir/../uclibc_crosstools.tar.gz
+
+
+echo ""
+echo "All Done, type:"
+echo "   cd $single_dir"
+echo "   make PROFILE=VDSL"
+echo ""
+

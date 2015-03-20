@@ -1,0 +1,22 @@
+#! /bin/sh
+
+PATH=/sbin:/bin
+export PATH
+
+
+## Test Remount the rootfs using UnionFS
+#mkdir /var/rootfs-rw
+#mkdir /var/rw
+#mount -t unionfs -o dirs=/var/rw=rw:/dev/root=ro none /var/rootfs-rw/
+#cd /var/rootfs-rw
+#mkdir initx
+#pivot_root . ./initx
+#exec /usr/sbin/chroot . ./sbin/init < ./dev/ttyS0 > ./dev/ttyS0 2>&1
+
+
+mount -t proc proc /proc
+/bin/mount -a
+#/sbin/inetd
+
+dsldetails 8080 &
+/etc/init.d/runinit2.sh &

@@ -1,0 +1,30 @@
+#
+# $Id: PARTS 1399 2008-12-09 21:21:04Z kawk $
+#
+# Copyright (C) 2003 ETC s.r.o.
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+#
+# Written by Matan Ziv-Av <matan@svgalib.org>, 2003.
+#
+
+# bits 27-12 of the Device Identification Register
+0001001001010000	bcm1250		BCM1250
+0011001100010000	bcm3310		BCM3310
+0101010000100001	bcm5421s	BCM5421S
+0100011100010010	bcm4712		BCM4712
+0110001101011000	bcm6358		BCM6358
+0110001100010110	bcm6316		BCM63168

@@ -1,0 +1,358 @@
+#!/bin/bash
+
+source $BUILD_DIR/kernel/linux/.config
+
+TOP_DIR=`pwd`
+
+if [ "$MOD_DIR" == "" ] ; then
+    MOD_DIR=$PROFILE/modules
+fi
+
+if [ "$FSSRC_DIR" == "" ]; then
+    FSSRC_DIR=./fs.src
+fi
+
+if [ "$INSTALL_DIR" == "" ]; then
+    INSTALL_DIR=./$PROFILE/fs.install
+fi
+
+ROOTFS=$PROFILE/fs
+
+# Create file system dir
+if [ -L $ROOTFS ]; then
+  rm -rf $ROOTFS/*
+else
+  rm -rf $ROOTFS
+  mkdir $ROOTFS
+fi
+chmod 777 $ROOTFS
+# Copy files onto root file system
+echo "Creating target root file system..."
+cp -av $FSSRC_DIR/* $ROOTFS
+cp -av $INSTALL_DIR/* $ROOTFS
+# Create directories as needed
+mkdir $ROOTFS/dev
+mkdir $ROOTFS/mnt
+mkdir $ROOTFS/sys
+mkdir $ROOTFS/proc
+mkdir $ROOTFS/var
+mkdir $ROOTFS/etc/adsl
+mkdir $ROOTFS/data
+cp -av $BRCMDRIVERS_DIR/broadcom/char/adsl/bcm9$BRCM_CHIP/*.bin  $ROOTFS/etc/adsl
+
+if [ "$BRCM_KERNEL_ROOTFS" != "jffs2" ] && [ "$BRCM_KERNEL_AUXFS_JFFS2" == "y" ] ; then
+    chmod +w $ROOTFS/etc/fstab
+    echo -e "/dev/mtdblock1\t/data\tjffs2\tnofail\t0\t0\n" >> $ROOTFS/etc/fstab
+    chmod -w $ROOTFS/etc/fstab
+fi
+	
+if [ "$BRCM_CHIP" == "6816" ] ; then
+        mkdir $ROOTFS/etc/cmf
+        if [ "$CONFIG_BCM_GPON_160MHz_FFE" == "y" ] ; then
+             cp -av $BRCMDRIVERS_DIR/broadcom/char/pktcmf/bcm9$BRCM_CHIP/ffe/*160MHz*.h  $ROOTFS/etc/cmf
+             cp -av $BRCMDRIVERS_DIR/broadcom/char/pktcmf/bcm9$BRCM_CHIP/ffe/*160MHz*.obj  $ROOTFS/etc/cmf
+             cp -av $BRCMDRIVERS_DIR/broadcom/char/pktcmf/bcm9$BRCM_CHIP/ffe/cmfcfg_160MHz  $ROOTFS/etc/cmf/cmfcfg
+        else
+             cp -av $BRCMDRIVERS_DIR/broadcom/char/pktcmf/bcm9$BRCM_CHIP/ffe/*.h  $ROOTFS/etc/cmf
+             cp -av $BRCMDRIVERS_DIR/broadcom/char/pktcmf/bcm9$BRCM_CHIP/ffe/*.obj  $ROOTFS/etc/cmf
+             cp -av $BRCMDRIVERS_DIR/broadcom/char/pktcmf/bcm9$BRCM_CHIP/ffe/cmfcfg  $ROOTFS/etc/cmf
+             rm -f $ROOTFS/etc/cmf/*160MHz*
+             rm -f $ROOTFS/etc/cmf/*6818*
+        fi
+fi
+
+if [ "$BRCM_CHIP" == "6818" ] ; then
+        mkdir $ROOTFS/etc/cmf
+        cp -av $BRCMDRIVERS_DIR/broadcom/char/pktcmf/bcm9$BRCM_CHIP/ffe/*6818*.h  $ROOTFS/etc/cmf
+        cp -av $BRCMDRIVERS_DIR/broadcom/char/pktcmf/bcm9$BRCM_CHIP/ffe/*6818*.obj  $ROOTFS/etc/cmf
+        cp -av $BRCMDRIVERS_DIR/broadcom/char/pktcmf/bcm9$BRCM_CHIP/ffe/cmfcfg_6818cmf  $ROOTFS/etc/cmf/cmfcfg
+fi
+
+if [ "$BRCM_KERNEL_OPROFILE" == "y" ] ; then
+   mkdir -p $ROOTFS/dev/oprofile
+fi
+
+
+#
+# Make a mountpoint for CGROUPS.
+# Making a mount point in buildFS is only in 4.12.  In 4.14, this logic is
+# moved to userspace/public/apps/cgroupctl/Makefile
+#
+if [ "$CONFIG_CGROUPS" == "y" ]; then
+    mkdir -p $ROOTFS/cgroups/cputree
+fi
+
+
+#
+# Make a mountpoint for the debugFS, which is currently only used by ftrace.
+# Making a mountpoint in buildFS is only in 4.12.  In 4.14, this logic is
+# moved to userspace/public/apps/tracectl/Makefile
+#
+if [ "$CONFIG_TRACING" == "y" ]; then
+    mkdir -p $ROOTFS/sys/kernel/debug
+    rm -f $ROOTFS/debug
+    ln -s sys/kernel/debug $ROOTFS/debug
+fi
+
+
+# this tells busybox to set the core rlimit to unlimited, thus allowing
+# apps to dump their core when they crash
+if [ "$CONFIG_ELF_CORE" == "y" ]; then
+   touch $ROOTFS/.init_enable_core
+fi
+
+
+if [ "$CONFIG_EPON_SDK" != "" ] ; then
+   mkdir $ROOTFS/etc/epon
+   echo "Copying 3715 images..."
+   if [ "$BRCM_CHIP" == "6828" ] ; then
+      cp -avrf $BUILD_DIR/userspace/private/libs/eponsdk/firmware/6828/Boot*.tkf $ROOTFS/etc/epon/bootcode
+      cp -avrf $BUILD_DIR/userspace/private/libs/eponsdk/firmware/6828/App*.tkf $ROOTFS/etc/epon/appfw
+      cp -avrf $BUILD_DIR/userspace/private/libs/eponsdk/firmware/6828/Pers* $ROOTFS/etc/epon/
+   else
+      cp -avrf $BUILD_DIR/userspace/private/libs/eponsdk/firmware/Boot*.tkf $ROOTFS/etc/epon/bootcode
+      cp -avrf $BUILD_DIR/userspace/private/libs/eponsdk/firmware/App*.tkf $ROOTFS/etc/epon/appfw
+      if [ "$BRCM_CHIP" == "6328" ] ; then
+         PERS_FILE_PREFIX="63293"
+      elif [ "$BRCM_CHIP" == "6362" ] ; then
+         PERS_FILE_PREFIX="63629"
+      else
+         PERS_FILE_PREFIX="$BRCM_CHIP"
+      fi
+      PERS_FILE=`echo $BUILD_DIR/userspace/private/libs/eponsdk/firmware/personality/"$PERS_FILE_PREFIX"_GMII_Pers*.tkf|sed -e 's/\"//g'`
+      if [ -f "$PERS_FILE" ] ; then
+         cp -avrf $PERS_FILE $ROOTFS/etc/epon/gmii_pers
+      fi
+      PERS_FILE=`echo $BUILD_DIR/userspace/private/libs/eponsdk/firmware/personality/"$PERS_FILE_PREFIX"_MII_Pers*.tkf|sed -e 's/\"//g'`
+      if [ -f "$PERS_FILE" ] ; then
+         cp -avrf $PERS_FILE $ROOTFS/etc/epon/mii_pers
+      fi
+   fi
+fi
+
+DEFAULTCFG=`echo $DEFAULTCFG_DIR/$BRCM_DEFAULTCFG|sed -e 's/\"//g'`
+if [ -f "$DEFAULTCFG" ]; then
+   cp -v $DEFAULTCFG $ROOTFS/etc/default.cfg; chmod a+r $ROOTFS/etc/default.cfg
+elif [ $BRCM_DEFAULTCFG != '""' ]; then
+   echo
+   echo "        No default run-time config file called $BRCM_DEFAULTCFG in $DEFAULTCFG_DIR"
+   echo "        Check your profile setting!"
+   exit 1
+else
+   echo
+fi
+
+#
+# The logic to test BRCM_CERT_FILE must be different than the logic to test
+# BRCM_DEFAULTCFG (above) because BRCM_CERT_FILE can have 3 possible values:
+# 1. If user does not select TR69_BCM_SSL, then BRCM_CERT_FILE=
+# 2. If user selects TR69_BCM_SSL, but does not specify a cert file, then BRCM_CERT_FILE=""
+# 3. If user selects TR69_BMC_SSL, and specifies a cert file, then BRCM_CERT_FILE="somefilename"
+#
+# The elif line tests for case 1 first, so that if BRCM_CERT_FILE is blank,
+# the first condition will be false and the second condition [ $BRCM_CERT_FILE != '""' ]
+# will not be tested.  That second condition will cause bash to complain if BRCM_CERT_FILE is blank.
+#SKY_SSL_CERTIFICATE_NAME defined in buildconfig.cfg
+DEFAULT_CERT_FILE=`echo $DEFAULTCFG_DIR/$SKY_SSL_CERTIFICATE_NAME|sed -e 's/\"//g'`
+
+if [ -f "$DEFAULT_CERT_FILE" ]; then
+   cp -v $DEFAULT_CERT_FILE $ROOTFS/etc/acscert.cacert; chmod a+r $ROOTFS/etc/acscert.cacert
+elif [ "X$BRCM_CERT_FILE" != "X" ] && [ $BRCM_CERT_FILE != '""' ]; then
+   echo
+   echo "        No certificate file called $BRCM_CERT_FILE in $DEFAULTCFG_DIR"
+   echo "        Check your profile setting!"
+   exit 1
+else
+   echo
+fi
+
+# Create symbolic links
+mkdir $ROOTFS/dev/misc
+ln -s /var/fuse $ROOTFS/dev/misc/fuse
+ln -s /var/fuse $ROOTFS/dev/fuse
+ln -s /var/mtab $ROOTFS/etc/mtab
+ln -s /var/log/log $ROOTFS/dev/log
+ln -s /var/sysmsg $ROOTFS/etc/sysmsg
+ln -s /var/passwd $ROOTFS/etc/passwd
+ln -s /var/group $ROOTFS/etc/group
+ln -s /var/ppp/pppmsg $ROOTFS/etc/pppmsg
+ln -s /var/fyi/sys/dns $ROOTFS/etc/resolv.conf
+ln -s /var/fyi/sys/gateway $ROOTFS/etc/gateway.conf
+ln -s /var/udhcpd/udhcpd.conf $ROOTFS/etc/udhcpd.conf
+ln -s /var/auxfs/udhcpd.leases $ROOTFS/etc/udhcpd.leases
+ln -s /var/dms.conf $ROOTFS/etc/dms.conf
+ln -s /var/ipsec/ipsec.conf $ROOTFS/etc/ipsec.conf
+ln -s /var/ipsec/racoon.conf $ROOTFS/etc/racoon.conf
+ln -s /var/ipsec/psk.txt $ROOTFS/etc/psk.txt
+ln -s /var/iproute2/rt_tables $ROOTFS/etc/iproute2/rt_tables
+ln -s /var/tmp $ROOTFS/tmp
+ln -s /var/samba $ROOTFS/etc/samba
+ln -s /data $ROOTFS/usr/local/data
+
+if [ -x $PROFILE/special-buildFS ]; then
+   $PROFILE/special-buildFS
+fi
+
+# Copy proprietary binaries if any
+FSBIN=`ls $TOP_DIR/fs.bin|wc -l`
+if [ $FSBIN != 0 ]; then
+   echo "Copying proprietary binaries..."
+   cd $TOP_DIR
+   cp -avf fs.bin/* $ROOTFS
+fi
+
+# Copy 3rdParty supplied .ko onto dummy .ko
+if [ "$BRCM_DRIVER_ISDN" == "m" ] ; then
+   echo "Copying 3rdParty kernel objects (.ko) ..."
+   eval "find $TOP_DIR/$ROOTFS/../modules/lib/modules/. -name '*isdn.ko' | xargs cp -f $BRCMDRIVERS_DIR/broadcom/char/isdn/bcm9$BRCM_CHIP/3rdParty/*isdn.ko_3rdParty "
+fi
+
+#Copying gpon tools
+if [ "$BRCM_DRIVER_GPON" != "" ] ; then
+   if [ "$CONFIG_BCM_GPON_IMPL" == "2" ]; then
+     TGT_DIR=$ROOTFS/etc
+   else
+     TGT_DIR=$ROOTFS/opt
+   fi
+
+   echo "Copying gpon tools to $TGT_DIR"
+     if [ "$BRCM_GPON_FPGA" == "y" ]; then
+     cp -avrf $BRCMDRIVERS_DIR/broadcom/char/gpon/impl$CONFIG_BCM_GPON_IMPL/fs/fpga/gpon/* $TGT_DIR
+     else
+     cp -avrf $BRCMDRIVERS_DIR/broadcom/char/gpon/impl$CONFIG_BCM_GPON_IMPL/fs/6816/gpon/* $TGT_DIR
+	  rm -rf $TGT_DIR/scripts/rsmibclr*
+     if [ "$BRCM_CHIP" != "6816" ]; then
+     cp -avrf $BRCMDRIVERS_DIR/broadcom/char/gpon/impl$CONFIG_BCM_GPON_IMPL/fs/6816/gpon/scripts/rsmibclr_6818 $TGT_DIR/scripts/rsmibclr
+     else
+     cp -avrf $BRCMDRIVERS_DIR/broadcom/char/gpon/impl$CONFIG_BCM_GPON_IMPL/fs/6816/gpon/scripts/rsmibclr $TGT_DIR/scripts/
+     fi
+     fi
+
+   if [ -d $ROOTFS/opt/modules ]; then
+     pushd $ROOTFS/opt/modules && for f in *.ko.save; do mv "$f" "${f%.ko.save}.ko"; done
+     popd
+   fi
+fi
+
+#Copying i2c scripts to /opt/scripts
+if [ "$BRCM_DRIVER_I2C" != "" ] ; then
+   echo "Copying i2c scripts to /opt/"
+   cp -avrf $BRCMDRIVERS_DIR/broadcom/char/i2c/chips/impl1/fs/* $ROOTFS/opt
+fi
+
+#Copying bcmlog tools to /usr/local
+if [ "$BRCM_DRIVER_LOG" != "" ] ; then
+   echo "Copying proc/bcmlog tools to /opt/..."
+   cp -avrf $BUILD_DIR/userspace/public/scripts/procbcmlog/* $ROOTFS/opt/scripts
+   if [ "$BRCM_CHIP" != "6816" ]; then
+      rm -f $ROOTFS/opt/scripts/ssrw
+   fi
+   if [ -d $ROOTFS/opt/modules ]; then
+     pushd $ROOTFS/opt/modules && for f in *.ko.save; do mv "$f" "${f%.ko.save}.ko"; done
+     popd
+   fi
+fi
+
+cd $MOD_DIR
+cp -a lib $TOP_DIR/$ROOTFS/.
+
+if [ "$STRIP" != "/bin/touch" ]; then
+# Stripping unneeded module symbols only when strip is "enabled"
+echo "Stripping kernel modules..."
+find $TOP_DIR/$ROOTFS/lib/modules -name "*.ko"
+   if [ "$CONFIG_KALLSYMS" == "y" ]; then
+      #if KALLSYMS is enabled only strip debug symbols from all modules, this helps
+      #to retain symbols of static functions 
+      eval "find $TOP_DIR/$ROOTFS/lib/modules -name '*.ko' |xargs $STRIP --strip-debug"
+   else
+      #Modules that need parameters cannot be stripped
+      eval "find $TOP_DIR/$ROOTFS/lib/modules -name '*.ko' ! -name 'ip*.ko' |xargs $STRIP --strip-unneeded"
+      # However do strip debug symbols, in case debug symbols are included
+      eval "find $TOP_DIR/$ROOTFS/lib/modules -name 'ip*.ko' |xargs $STRIP --strip-debug"
+   fi
+fi
+
+
+#delete unwanted module
+echo "deleting intermediate wl modules"
+MODULE_CLEAN_UP="wldrv.ko wl_tmp_partial.ko wlpartial.ko"
+#remove unnecessary wlan driver
+if [ "${WLBUS}"  != "" ]; then
+    if [ `expr index $WLBUS pci` == 0 ]; then
+           MODULE_CLEAN_UP=${MODULE_CLEAN_UP}" wl.ko"
+    fi
+    if [ `expr index $WLBUS usb` == 0 ]; then
+           MODULE_CLEAN_UP=${MODULE_CLEAN_UP}" wl-usb.ko"
+    fi
+else
+   MODULE_CLEAN_UP=${MODULE_CLEAN_UP}" wl-usb.ko"
+fi
+for f in $MODULE_CLEAN_UP; do \
+   eval "find $TOP_DIR/$ROOTFS/lib/modules -name $f |xargs rm -f";\
+done
+eval "find $TOP_DIR/$ROOTFS/lib/modules -name wlobj-*.ko | xargs rm -f"
+
+# strip userspace binaries is sstrip is "enabled"
+# sstrip is set to /bin/touch if BUILD_GDBSERVER=y
+if [ "$SSTRIP" != "/bin/touch" ]; then
+    # Even though libcreduction did some stripping, we can make the
+    # libraries even smaller by doing sstrip here.  Also libcreduction
+    # does not process all libs, e.g. libmdm.so
+    echo "Stripping userspace binaries..."
+    $SSTRIP $TOP_DIR/$ROOTFS/bin/* $TOP_DIR/$ROOTFS/lib/*.so* $TOP_DIR/$ROOTFS/lib/*/*.so*
+fi
+
+# Symlink cms libraries needed by busybox, which is also the actual /sbin/init
+# When user space boots, LD_LIBRARY_PATH hasn't been parsed yet
+test -e $TOP_DIR/$ROOTFS/lib/public/libcms_msg.so && ln -s /lib/public/libcms_msg.so $TOP_DIR/$ROOTFS/lib/libcms_msg.so
+test -e $TOP_DIR/$ROOTFS/lib/public/libcms_boardctl.so && ln -s /lib/public/libcms_boardctl.so $TOP_DIR/$ROOTFS/lib/libcms_boardctl.so
+test -e $TOP_DIR/$ROOTFS/lib/public/libcms_util.so && ln -s /lib/public/libcms_util.so $TOP_DIR/$ROOTFS/lib/libcms_util.so
+# If we support wget https in busybox, need to create symlink on ssl libraries
+if [ "$BUILD_WGET_HTTPS" == "y" ]; then
+test -e $TOP_DIR/$ROOTFS/lib/public/libssl.so.0.9.7 && ln -s /lib/public/libssl.so.0.9.7 $TOP_DIR/$ROOTFS/lib/libssl.so.0.9.7
+test -e $TOP_DIR/$ROOTFS/lib/public/libcrypto.so.0.9.7 && ln -s /lib/public/libcrypto.so.0.9.7 $TOP_DIR/$ROOTFS/lib/libcrypto.so.0.9.7
+fi
+
+
+
+# Remove some binaries from the SKY fs tarball
+#   Dont worry about the errors that occur on multiple compiles
+cd $TOP_DIR/$ROOTFS/..
+gunzip filesystem.tgz
+tar --wildcards --delete -f filesystem.tar './dev/sde*'
+tar --wildcards --delete -f filesystem.tar './dev/sdf*'
+tar --wildcards --delete -f filesystem.tar './dev/sdg*'
+tar --wildcards --delete -f filesystem.tar './dev/sdh*'
+tar --wildcards --delete -f filesystem.tar './dev/sd*5'
+tar --wildcards --delete -f filesystem.tar './dev/sd*6'
+tar --wildcards --delete -f filesystem.tar './dev/sd*7'
+tar --wildcards --delete -f filesystem.tar './dev/sd*8'
+tar --wildcards --delete -f filesystem.tar './dev/sd*9'
+
+tar --delete -f filesystem.tar './bin/busybox'
+tar --delete -f filesystem.tar './bin/tr69c'
+tar --delete -f filesystem.tar './bin/fus'
+tar --delete -f filesystem.tar './bin/factory'
+tar --delete -f filesystem.tar './bin/tinyproxy'
+#tar --delete -f filesystem.tar './bin/skyanytimeupnp'
+#tar --delete -f filesystem.tar './bin/skyhealthmonitor'
+#tar --delete -f filesystem.tar './bin/skyselfheal'
+#tar --delete -f filesystem.tar './bin/skytest'
+tar --delete -f filesystem.tar './etc/init.d/rcS'
+
+tar --delete -f filesystem.tar './webs/sky_dynamic_dns.html'
+tar --delete -f filesystem.tar './webs/sky_lan_ip_setup.html'
+tar --delete -f filesystem.tar './webs/sky_remote_management.html'
+tar --delete -f filesystem.tar './webs/sky_router_upgrade.html'
+tar --delete -f filesystem.tar './webs/sky_upnp.html'
+tar --delete -f filesystem.tar './webs/sky_wan_setup.html'
+tar --delete -f filesystem.tar './webs/assets/images/sky_logo.png'
+tar --delete -f filesystem.tar './webs/assets/images/sky_logo_mobile.png'
+gzip filesystem.tar
+mv filesystem.tar.gz filesystem.tgz
+
+
+
+# If a consumer release has created a filesystem tarball, fill in
+# any missing proprietary binaries using that tarball
+( cd $TOP_DIR/$ROOTFS ; tar xzkf ../filesystem.tgz 2>/dev/null ; true )

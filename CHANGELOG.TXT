@@ -1,0 +1,34 @@
+Revision 3765:
+Restored original Busybox version - due to knock-on BUG
+Added option to change LAN MAC Address
+Added 'DslDiagD' binary for Detailed Line Diagnostics
+Enabled a few other options (in buildconfig.cfg)
+
+
+
+Revision 3764:
+Added new Web page for changing DSL line Username/Password (Advanced > Extras)
+Enabled Broadcom Web Interface (some options dont work)
+Enabled Telnet
+Disables WAN ping & port 30005
+Replaced BusyBox
+Added MTD blocks - CFE, NVRAM, Spare 4MB, Full Flash - for better access
+Added UnionFS - Currently not implemented
+Auto executes file '/var/auxfs/init2.sh' for custom startup scripts, e.g. Overlay spare MTD block.
+Disabled signature validation for GUI firmware uploading
+Removed tr69c		(Remote managment)
+Removed fus		(Firmware Upgrade)
+Removed factory
+Removed tinyproxy
+
+
+
+Revision 3763:
+Just released Binaries, similar to Rev 3764
+
+
+
+Revision 3761:
+Original GLP Source from SKY
+
+

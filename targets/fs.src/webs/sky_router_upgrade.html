@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- v4.2 -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Sky Hub &gt; Upgrade</title>
+<link type="text/css" rel="stylesheet" href="assets/css/fonts.css"/>
+<link type="text/css" rel="stylesheet" href="assets/css/main.css"/>
+<!-- jh scripts start -->
+<script type="text/javascript" src="assets/js/libs/jquery/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="assets/js/libs/jquery/jquery.effects.core.js"></script>
+<!--[if LT IE 7]>
+			<script type="text/javascript" src="assets/js/libs/DD_belatedPNG_0.0.8a.js"></script>
+		<![endif]-->
+<script type="text/javascript" src="assets/js/utilities.js"></script>
+<script type="text/javascript" src="assets/js/libs/modernizr.touch.js"></script>
+<script type="text/javascript" src="assets/js/init.js"></script>
+<!-- jh scripts end -->
+<script type="text/javascript" src="assets/js/sky_utility.js"></script>
+<script type="text/javascript" src="assets/js/sky_linux.js"></script>
+<script type="text/javascript" src="assets/js/sky_script.js"></script>
+<script type="text/javascript">
+     <!--//
+
+var if_allow_submit=false;
+var progress = 0;
+var showit = (document.layers) ? "show" : "visible";
+var hideit = (document.layers) ? "hide" : "hidden";
+var NS4 = (document.layers);
+var animationTimer = null;
+
+function post_me()
+{
+	var cf=document.forms[0];
+	if (if_allow_submit==false)
+		return ;
+	if (cf.filename.value=='')
+	{
+		alert("No filename selected!");
+		return ;
+	}
+   if ( progress == 0 )
+   {
+      progress = 1;
+      alert("The Sky Hub will be restarted after completion of software update. Please do not turn off Sky Hub whilst software update is in progress");
+      cf.submit();
+	  return true;
+   }
+   alert('Software update is in progress. Please wait');
+   return ;	
+}
+
+function isInProgress()
+{
+	var cf=document.forms[0];
+	if (if_allow_submit==false)
+		return ;
+	if (cf.filename.value=='')
+	{
+		alert("No filename selected!");
+		return ;
+	}
+   if ( progress == 0 )
+   {
+      progress = 1;
+      return true;
+   }
+   alert('Software update is in progress. Please wait');
+   return ;
+}
+
+function setVisible(divID, setto)
+{
+/*
+	if (NS4)
+		document.layers[divID].visibility = setto;
+	else if (document.all)
+		document.all(divID).style.visibility = setto;
+	else if (document.getElementById)
+		document.getElementById(divID).style.visibility = setto;
+*/
+}
+
+function stopAnimation()
+{
+	if(animationTimer != null)
+		clearTimeout(animationTimer);
+	setVisible('animation', hideit);
+}
+
+function checkData()
+{
+    var up_msg = "Are you sure you would like to continue?\n All active Internet connection will be terminated.";
+	var a;
+	var msg="";
+	var temp_win;
+	var t_str = document.forms[0].mtenFWUpload.value;
+	
+	if(!if_allow_submit)
+		return false;
+	
+	if(t_str.split) 
+		a = t_str.split(".");
+	else
+		a = cdisplit(t_str,".");
+	if(t_str.length == 0)
+	{
+		alert("No filename selected. Please select the correct file\n");
+		return ;
+	}
+	if((a.length<2)||(a[0]=="")||(a[a.length-1].toLowerCase()!="img"))
+	{    
+	    alert("Invalid filename selected, please re-select correct file:(*.img)\n");
+	    return ;
+	}
+	if (!confirm(up_msg))
+	   	return ;
+	animationTimer = setTimeout("setVisible('animation', showit)",1000);
+	return true;
+}
+     //-->
+   </script>
+</head>
+<body onload="stopAnimation();loadhelp('upgrd');document.forms[0].elements[0].focus();">
+<!-- head -->
+<div id="head">
+  <div id="header">
+    <div class="layout"><span id="header-title"><a href="sky_index.html">Sky Hub</a></span><img src="assets/images/sky_logo.png" width="83" height="51" id="header-logo"/> </div>
+  </div>
+  <!-- nav -->
+  <div id="nav">
+    <div id="main-nav">
+      <div class="layout">
+        <ul id="topmenu">
+          <li><a id="wireless" href="sky_wireless_settings.html">Wireless</a></li>
+          <li><a id="security" href="sky_logs.html">Security</a></li>
+          <li class="selected"><a id="maintenance" href="sky_router_status.html">Maintenance</a></li>
+          <li><a id="advanced" href="sky_wan_setup.html">Advanced</a></li>
+          <li><a id="support" href="sky_support.html">Support</a></li>
+          <li><a id="licence" href="sky_license.html">Licensing Information</a></li>
+        </ul>
+        <a id="logout" href="sky_logout.html">Logout</a> </div>
+    </div>
+    <div id="sub-nav">
+      <div class="layout">
+        <ul id="submenu-wireless">
+          <li><a href="sky_wireless_settings.html">Wireless Settings</a></li>
+          <li><a href="sky_wireless_wps.html">Wireless WPS</a></li>
+        </ul>
+        <ul id="submenu-security">
+          <li><a href="sky_logs.html">Logs</a></li>
+          <li><a href="sky_block_sites.html">Block Sites</a></li>
+          <li><a href="sky_firewall_rules.html">Firewall Rules</a></li>
+          <li><a href="sky_services.html">Services</a></li>
+          <li><a href="sky_schedule.html">Schedule</a></li>
+        </ul>
+        <ul id="submenu-maintenance" class="selected">
+          <li><a href="sky_router_status.html">Router Status</a></li>
+          <li><a href="sky_attached_devices.html">Attached Devices</a></li>
+          <li><a href="sky_backup_settings.html">Backup Settings</a></li>
+          <li><a href="sky_set_password.html">Set Password</a></li>
+          <li><a href="sky_diagnostics.html">Diagnostics</a></li>
+          <li class="selected"><a href="sky_router_upgrade.html">Router Upgrade</a></li>
+        </ul>
+        <ul id="submenu-advanced">
+          <li><a href="sky_wan_setup.html">WAN Setup</a></li>
+          <li><a href="sky_dynamic_dns.html">Dynamic DNS</a></li>
+          <li><a href="sky_lan_ip_setup.html">LAN IP Setup</a></li>
+          <li><a href="sky_remote_management.html">Remote Management</a></li>
+          <li><a href="sky_upnp.html">UPnP</a></li>
+        </ul>
+        <ul id="submenu-support">
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- nav end -->
+</div>
+<!-- head end -->
+<!-- content -->
+<div id="content">
+  <!-- layout -->
+  <div class="layout">
+    <div id="content-header">
+      <div id="content-header-copy">
+        <h1>Sky Hub Upgrade</h1>
+        <p class="black"><strike>We'll periodically update your Sky Hub software automatically. There may be times when you will be advised to do this manually. Sky Technical Support will assist you if this is the case.</strike></p>
+        <p><b>Important:</b> Once you select Upload do not interrupt the process of updating the software on the Sky Hub or restart the Sky Hub. If you think the process may be interrupted in some way, click Cancel to keep the current Sky Hub software.</p>
+        <p><b>Additional:</b> This will no longer validate the signatures in the file. But it still expects to see one near the bottom of the image.</p>
+      </div>
+      <div id="content-header-image"></div>
+      <br class="clear-break" />
+    </div>
+    <div id="content-body">
+      <!-- main-panel -->
+      <div class="main-panel">
+        <hr class="top" />
+        <div class="section-heading">
+          <h3>Select file from your Hard Disk:</h3>
+          <a class="help-btn" href="#" name="help1">help</a> </div>
+        <div class="row-holder">
+          <form method="post" enctype="multipart/form-data" action="sky_upload.cgi">
+            <input name="filename" size="40" maxlength="128" value="" type="file"/>
+          </form>
+        </div>
+        <hr />
+        <div class="buttons-holder"> <a href="javascript: if_allow_submit=false; window.location.href='sky_router_upgrade.html'" class="btn42 btn-silver png"><span class="png">Cancel</span></a> <a href="javascript: if_allow_submit=true; post_me();" class="btn42 btn-pink png"><span class="png">Apply</span></a></div>
+        <form method="post" action="" onsubmit="javascript: return false;">
+        </form>
+      </div>
+      <!-- main-panel end -->
+      <!-- side-panel -->
+      <div class="side-panel">
+        <!-- HELP 1 -->
+        <div class="pod pod-help" id="help1"><a href="#close" class="help-close"></a>
+          <div class="content">
+            <h3>To upgrade the Sky Hub software</h3>
+            <p>You will be advised to go to a Sky website and download the updated software.</p>
+            <p>You may want to read the Release Notes before continuing.</p>
+            <ul>
+              <li>Select <b>Browse</b></li>
+              <li>Locate and select the file you just downloaded and uncompressed</li>
+              <li>Click <b>Upload</b> to update the software on the Sky Hub</li>
+            </ul>
+            <p>This loads the new software in the Sky Hub and causes the Sky Hub to restart.</p>
+            <p><b>Important:</b> Whilst upgrading your Sky Hub software don't go online, shutdown the computer, turn off or do anything else to the Sky Hub until it fully reboots.</p>
+            <ul>
+              <li>Select <b>Sky Hub</b> and check the Firmware Version to verify that your Sky Hub now has the new software installed</li>
+            </ul>
+            <p><b>Note:</b> In some cases, such as a major upgrade, you may need to reconfigure settings of your Sky Hub after upgrading it. Refer to the Release Notes included with the software to find out if you need to reconfigure the Sky Hub.</p>
+            <p><b>Additional:</b> The signature at the bottom of the file, can be easily copied from the default Sky recovery image from their web site.</p>
+          </div>
+          <span class="arrow arrow-l png"></span> </div>
+      </div>
+      <!-- side-panel end -->
+      <br class="clear-break" />
+    </div>
+  </div>
+  <!-- layout end -->
+</div>
+<!-- content end -->
+</div>
+</body>
+</html>

@@ -1,0 +1,885 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- v4.2 -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Sky Hub &gt; LAN IP Setup</title>
+<link type="text/css" rel="stylesheet" href="assets/css/fonts.css"/>
+<link type="text/css" rel="stylesheet" href="assets/css/main.css"/>
+<!-- jh scripts start -->
+<script type="text/javascript" src="assets/js/libs/jquery/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="assets/js/libs/jquery/jquery.effects.core.js"></script>
+<!--[if LT IE 7]>
+			<script type="text/javascript" src="assets/js/libs/DD_belatedPNG_0.0.8a.js"></script>
+		<![endif]-->
+<script type="text/javascript" src="assets/js/utilities.js"></script>
+<script type="text/javascript" src="assets/js/libs/modernizr.touch.js"></script>
+<script type="text/javascript" src="assets/js/init.js"></script>
+<!-- jh scripts end -->
+<script type="text/javascript" src="assets/js/sky_utility.js"></script>
+<script type="text/javascript" src="assets/js/sky_linux.js"></script>
+<script type="text/javascript" src="assets/js/sky_script.js"></script>
+<script type="text/javascript">
+
+var dhcpStart = '<%ejGet(dhcpEthStart)%>';
+var dhcpEnd = '<%ejGet(dhcpEthEnd)%>';
+var dhcpLease = '<%ejGet(dhcpLeasedTime)%>';
+//var enblLanFirewall = '<%ejGet(enblLanFirewall)%>';
+var proto = '<%ejGetOther(sysInfo, noBrPrtcl)%>';
+var ipExt = '<%ejGetOther(sysInfo, pppIpExtension)%>';
+var dhcpEnbl = '<%ejGet(enblDhcpSrv)%>';
+var msg_restart = "Change in LAN IP setup will restart the Sky Hub and terminate any active connections to the Internet";
+var msg_lanipchange = "";
+var if_allow_submit = false;
+
+var delay_time = 1000; // msecs
+var Ipaddr = '<%ejGet(ethIpAddress)%>';
+var newip;
+var subnet_same;
+
+function check_if_allow_submit()
+{
+  var ret = false;
+    
+	if (if_allow_submit==false)
+	{
+		return ;   
+	} 
+
+	if (checkData() == true)
+	{
+		if (lanIPChangeOnly())
+		{
+				ret=confirm(msg_restart);
+				if (ret == true)
+				{
+					document.forms[0].submit();
+					/*setTimeout("gotolanipChange()",delay_time);*/
+				}
+				else
+				{
+					location.reload(true);	
+				}
+
+		}
+		else if (DhcpSubnetChange())
+		{
+				ret=confirm(msg_restart);
+				if (ret == true)
+				{
+					document.forms[0].submit();
+					/*setTimeout("gotolanipChange()",delay_time);*/
+				}		
+				else
+				{
+					location.reload(true);	
+				}
+
+		}
+		else if ( ((dhcpEnbl == '1') && (document.forms[0].dhcp_server.checked == false) ) || ((dhcpEnbl == '0') && (document.forms[0].dhcp_server.checked == true) )) 
+		{
+			ret=confirm("DHCP changes will restart the Sky Hub and terminate any active connections to the internet");
+			if (ret == true)
+			{
+			       document.forms[0].submit();
+			     /*setTimeout("gotolanipChange()",delay_time);*/
+			}	
+			else
+			{
+				location.reload(true);	
+			}
+		}
+		else
+		{
+			 document.forms[0].submit();
+		}
+		return ret;
+	}
+  
+  return ;
+}
+function jump_fromform0()
+{
+  var cf= document.forms[0];
+  var ua = window.navigator.userAgent
+  var retval = ua.indexOf ( "MSIE " );
+  cf.todo.value="reboot";
+  if(retval>0)
+ {
+	
+  	retval=check_if_allow_submit();
+       if(retval==true)
+      stdAction(cf, "reboot");
+ }
+  else
+  	return ;
+
+}
+
+
+
+
+function lanIPChangeOnly()
+{
+	var cf = document.forms[0];
+	var Lanip = [0, 0, 0, 0];
+    var Iptemp=Ipaddr.split('.'); 
+
+	msg_lanipchange = "";
+	newip = "";
+		
+    Lanip[0] = parseInt(cf.sysLANIPAddr1.value);
+    Lanip[1] = parseInt(cf.sysLANIPAddr2.value);
+    Lanip[2] = parseInt(cf.sysLANIPAddr3.value);
+    Lanip[3] = parseInt(cf.sysLANIPAddr4.value);
+
+	newip = Lanip[0]+"." + Lanip[1]+"." + Lanip[2]+"." + Lanip[3]
+
+	if ( (Lanip[0] ==  Iptemp[0]) && (Lanip[1] ==  Iptemp[1]) && (Lanip[2] ==  Iptemp[2]) && (Lanip[3] == Iptemp[3]) )		
+	{
+		//msg_lanipchange = "Press OK to change the ip address to " + newip + ". Please remove and reconnect the ethernet cable of laptop / computer";
+		return false;	
+	}
+	else
+	{
+		return true;
+	}
+
+}
+
+
+function DhcpSubnetChange()
+{
+	var cf = document.forms[0];
+	var PoolStart = [0, 0, 0, 0];
+	var PoolEnd = [0, 0, 0, 0];
+    var dhcpStartAddr=dhcpStart.split('.'); 
+    var dhcpEndAddr=dhcpEnd.split('.'); 
+
+    PoolStart[0] = parseInt(cf.sysPoolStartingAddr1.value);
+    PoolStart[1] = parseInt(cf.sysPoolStartingAddr2.value);
+    PoolStart[2] = parseInt(cf.sysPoolStartingAddr3.value);
+    PoolStart[3]=  parseInt(cf.sysPoolStartingAddr4.value);
+	
+    PoolEnd[0] = parseInt(cf.sysPoolFinishAddr1.value);
+    PoolEnd[1] = parseInt(cf.sysPoolFinishAddr2.value);
+    PoolEnd[2] = parseInt(cf.sysPoolFinishAddr3.value);
+    PoolEnd[3] = parseInt(cf.sysPoolFinishAddr4.value);
+	if ( (PoolStart[0] !=  dhcpStartAddr[0]) ||  (PoolStart[1] !=    dhcpStartAddr[1]) ||  (PoolStart[2] !=   dhcpStartAddr[2]) ||(PoolStart[3] !=   dhcpStartAddr[3]) ||  
+		(PoolEnd[0] !=  dhcpEndAddr[0])  ||  (PoolEnd[1] !=  dhcpEndAddr[1])  ||  (PoolEnd[2] !=  dhcpEndAddr[2]) ||  (PoolEnd[3] !=  dhcpEndAddr[3]))		
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+
+}
+
+
+function gotolanipChange()
+{
+	var newLocation1 = "http://" + newip + "/sky_lan_ip_setup.html"
+	location.replace ( newLocation1 );
+}
+
+
+function setDhcpAddresses()
+{
+  var msg = "";
+  var cf = document.forms[0];
+
+  if (cf.dhcp_server.checked == true)
+  {
+    if (badLANIP(cf.sysLANIPAddr1, cf.sysLANIPAddr2, cf.sysLANIPAddr3, cf.sysLANIPAddr4, 254) 
+        || (parseInt(cf.sysLANIPAddr4.value) == 0))
+    {
+      msg += "Invalid IP Address, valid range is 1.0.0.1 to 223.255.255.254\n";
+      alert(msg);
+      return false;
+    }
+    
+    if ((cf.sysLANIPAddr1.value == "127") && (cf.sysLANIPAddr2.value == "0") 
+        && (cf.sysLANIPAddr3.value == "0") && (cf.sysLANIPAddr4.value == "1"))
+    {
+      msg += "Invalid IP Address, LAN IP Address cannot be 127.0.0.1\n";
+      alert(msg);
+      return false;
+    }
+    
+    dataToHidden(cf);
+    var SubMaskAddr = [0, 0, 0, 0];
+	
+    if ((cf.sysLANIPAddr1.value != "172") && (cf.sysLANIPAddr2.value != "16") && isValidSubnetMask(cf.c4_sysLANSubnetMask.value) == false)
+    {
+      msg += "Invalid net-mask value!";
+      alert(msg);
+      cf.sysLANSubnetMask1.value = 255;
+      cf.sysLANSubnetMask2.value = 255;
+      cf.sysLANSubnetMask3.value = 255;
+      cf.sysLANSubnetMask4.value = 0;
+      return false;
+    }
+
+    var Lanip = [0, 0, 0, 0];
+    var DhcpipPoolStart = [0, 0, 0, 0],  DhcpipPoolEnd = [0, 0, 0, 0]; 
+
+    Lanip[0] = parseInt(cf.sysLANIPAddr1.value);
+    Lanip[1] = parseInt(cf.sysLANIPAddr2.value);
+    Lanip[2] = parseInt(cf.sysLANIPAddr3.value);
+    Lanip[3] = parseInt(cf.sysLANIPAddr4.value);
+    
+    DhcpipPoolStart[0] = parseInt(cf.sysLANIPAddr1.value);
+    DhcpipPoolStart[1] = parseInt(cf.sysLANIPAddr2.value);
+    DhcpipPoolStart[2] = parseInt(cf.sysLANIPAddr3.value);
+    DhcpipPoolStart[3] = parseInt(cf.sysLANIPAddr4.value);
+    
+    DhcpipPoolEnd[0] = parseInt(cf.sysLANIPAddr1.value);
+    DhcpipPoolEnd[1] = parseInt(cf.sysLANIPAddr2.value);
+    DhcpipPoolEnd[2] = parseInt(cf.sysLANIPAddr3.value);
+    DhcpipPoolEnd[3] = parseInt(cf.sysLANIPAddr4.value);
+    
+    SubMaskAddr[0] = parseInt(cf.sysLANSubnetMask1.value);
+    SubMaskAddr[1] = parseInt(cf.sysLANSubnetMask2.value);
+    SubMaskAddr[2] = parseInt(cf.sysLANSubnetMask3.value);
+    SubMaskAddr[3] = parseInt(cf.sysLANSubnetMask4.value);
+
+    SubNet3 = 0;
+    broadcast = 255;
+	if ( (SubMaskAddr[0] == 255 && SubMaskAddr[1] == 0 &&  SubMaskAddr[2] == 0 ) && (SubMaskAddr[3] == 0 || SubMaskAddr[3] == 128 || SubMaskAddr[3] == 192 || SubMaskAddr[3] == 224 || SubMaskAddr[3]== 240 || SubMaskAddr[3] == 248 ||  SubMaskAddr[3] == 252))
+    {
+        /* 255.0.0.0 is only class A supported */
+        DhcpipPoolEnd[1] = 255;
+        DhcpipPoolEnd[2] = 255;
+    }
+	else if ( (SubMaskAddr[0] == 255 && SubMaskAddr[1] == 0 &&  SubMaskAddr[2] == 0 ) && (SubMaskAddr[3] != 0 || SubMaskAddr[3] != 128 || SubMaskAddr[3] != 192 || SubMaskAddr[3] != 224 || SubMaskAddr[3]!= 240 || SubMaskAddr[3] != 248 ||  SubMaskAddr[3] != 252))
+	{
+		msg +="Supported subnet mask range is: 255.0.0.0/255.0.0.128/255.0.0.192/255.0.0.224/255.0.0.240/255.0.0.248/255.0.0.252\n";
+		alert(msg);
+		cf.sysLANSubnetMask1.value = 255;
+        cf.sysLANSubnetMask2.value = 0;
+        cf.sysLANSubnetMask3.value = 0;
+        cf.sysLANSubnetMask4.value = 0;
+	}
+    else if (SubMaskAddr[0] == 255 && ((((cf.sysLANIPAddr1.value == "172") && (cf.sysLANIPAddr2.value == "16"))&&(SubMaskAddr[1] == 240 || SubMaskAddr[1] == 255 ))||SubMaskAddr[1] == 255) &&  SubMaskAddr[2] == 0 && (SubMaskAddr[3] == 0 || SubMaskAddr[3] == 128 || SubMaskAddr[3] == 192 || SubMaskAddr[3] == 224 || SubMaskAddr[3]== 240 || SubMaskAddr[3] == 248 ||  SubMaskAddr[3] == 252))
+    {
+        /* 255.255.0.0 is only class B supported */
+        DhcpipPoolEnd[1]=(SubMaskAddr[1] == 255) ? DhcpipPoolEnd[1] :DhcpipPoolEnd[1]+15;// This is for 16 continuous network address
+        DhcpipPoolEnd[2] = 255;    	
+    }  
+    else if (SubMaskAddr[0] == 255 && ((((cf.sysLANIPAddr1.value == "172") && (cf.sysLANIPAddr2.value == "16"))&&(SubMaskAddr[1] == 240 || SubMaskAddr[1] == 255 ))||SubMaskAddr[1] == 255) &&  SubMaskAddr[2] == 0 && (SubMaskAddr[3] != 0 || SubMaskAddr[3] != 128 || SubMaskAddr[3] != 192 || SubMaskAddr[3] != 224 || SubMaskAddr[3]!= 240 || SubMaskAddr[3] != 248 ||  SubMaskAddr[3] != 252))
+    {
+	 msg +="Supported subnet mask range is: 255.240.0.0-255.255.0.0/255.255.0.128/255.255.0.192/255.255.0.224/255.255.0.240/255.255.0.248/255.255.0.252\n";
+	 alert(msg);
+	 cf.sysLANSubnetMask1.value = 255;
+        cf.sysLANSubnetMask2.value = 255;
+        cf.sysLANSubnetMask3.value = 0;
+        cf.sysLANSubnetMask4.value = 0;
+    }   	
+    else if ((SubMaskAddr[0] == 255 && SubMaskAddr[1] == 255 &&  SubMaskAddr[2] == 255 ) && 
+        (SubMaskAddr[3] == 0 || SubMaskAddr[3] == 128 || SubMaskAddr[3] == 192 || SubMaskAddr[3] == 224 || SubMaskAddr[3]== 240 || SubMaskAddr[3] == 248 ||  SubMaskAddr[3] == 252))
+    {
+        SubNet3 = Lanip[3] & SubMaskAddr[3];
+        broadcast = SubNet3 + 255 - SubMaskAddr[3];
+    }
+    else
+    {
+    	 msg +="Supported subnet mask range is: Class B:255.240.0.0-255.255.0.0/255.255.0.128/255.255.0.192/255.255.0.224/255.255.0.240/255.255.0.248/255.255.0.252;Class A/C:255.255.255.0/24-30 \n";
+        alert(msg);
+        cf.sysLANSubnetMask1.value = 255;
+        cf.sysLANSubnetMask2.value = 255;
+        cf.sysLANSubnetMask3.value = 255;
+        cf.sysLANSubnetMask4.value = 0;
+        return false;  
+    }
+    
+    cf.sysPoolStartingAddr1.value = DhcpipPoolStart[0];
+    cf.sysPoolStartingAddr2.value = DhcpipPoolStart[1];
+    cf.sysPoolStartingAddr3.value = DhcpipPoolStart[2];
+    
+    cf.sysPoolFinishAddr1.value = DhcpipPoolEnd[0];
+    cf.sysPoolFinishAddr2.value = DhcpipPoolEnd[1];
+    cf.sysPoolFinishAddr3.value = DhcpipPoolEnd[2];
+
+    if (Lanip[3] == (broadcast - 1))
+    {
+        DhcpipPoolStart[3] = SubNet3 + 1;
+        DhcpipPoolEnd[3] = broadcast - 2;
+    }
+    else
+    {
+        DhcpipPoolStart[3] = Lanip[3] + 1;
+        DhcpipPoolEnd[3] = broadcast - 1;
+    }
+    
+    cf.sysPoolStartingAddr4.value = DhcpipPoolStart[3];
+    cf.sysPoolFinishAddr4.value = DhcpipPoolEnd[3];
+	
+  }
+  
+  return true;
+}
+
+function chgSel(index)
+{
+  document.forms[0].select.value = index;
+  return true;
+}
+
+function checkData()
+{
+  var msg = "";
+  var cf = document.forms[0];
+  var n1 = parseInt(cf.sysPoolStartingAddr4.value);
+  var n2 = parseInt(cf.sysPoolFinishAddr4.value);
+  var poolStartAddr = cf.sysPoolStartingAddr1.value + cf.sysPoolStartingAddr2.value +cf.sysPoolStartingAddr3.value + cf.sysPoolStartingAddr4.value;
+  var poolFinishAddr = cf.sysPoolFinishAddr1.value + cf.sysPoolFinishAddr2.value +cf.sysPoolFinishAddr3.value + cf.sysPoolFinishAddr4.value;
+  var staticIPList = '<%ejGetOther(staticiplease)%>';
+  var staticIPItemArray = staticIPList.split('<lf>');
+
+  if (badLANIP(cf.sysLANIPAddr1,cf.sysLANIPAddr2,cf.sysLANIPAddr3,cf.sysLANIPAddr4,254) ||(parseInt(cf.sysLANIPAddr4.value)==0))
+  {
+    msg+= "Invalid IP Address, valid range is 1.0.0.1 to 223.255.255.254\n";
+  }
+
+  if ((cf.sysLANIPAddr1.value == "127") && (cf.sysLANIPAddr2.value == "0") 
+      && (cf.sysLANIPAddr3.value == "0") && (cf.sysLANIPAddr4.value == "1"))
+  {
+  	msg+= "Invalid IP Address, LAN IP Address cannot be 127.0.0.1\n";
+  }
+
+  if (badIP(cf.sysLANSubnetMask1,cf.sysLANSubnetMask2,cf.sysLANSubnetMask3,cf.sysLANSubnetMask4,255))
+  {
+    msg+= "Invalid Subnet Mask, please re-enter\n";
+  }
+
+  if (cf.dhcp_server.checked)
+  {
+	if(poolStartAddr == poolFinishAddr)
+	{
+		msg+= "DHCP Start and End address cannot be same, please re-enter\n";
+	}
+
+    if (badIP(cf.sysPoolStartingAddr1,cf.sysPoolStartingAddr2,cf.sysPoolStartingAddr3,cf.sysPoolStartingAddr4,254) || (n1 == 0))
+    {
+      msg+= "Invalid DHCP starting IP address, please re-enter\n";
+    }
+
+    if (badIP(cf.sysPoolFinishAddr1,cf.sysPoolFinishAddr2,cf.sysPoolFinishAddr3,cf.sysPoolFinishAddr4,254) || (n2 == 0))
+    {
+      msg+= "Invalid DHCP ending IP address, please re-enter\n";
+    }
+
+
+    var dhcpStart= /*parseInt(cf.sysPoolStartingAddr1.value)*1000000000+*/
+        parseInt(cf.sysPoolStartingAddr2.value)*1000000+
+        parseInt(cf.sysPoolStartingAddr3.value)*1000+
+        parseInt(cf.sysPoolStartingAddr4.value);
+    var dhcpEnd= /*parseInt(cf.sysPoolFinishAddr1.value)*1000000000+*/
+        parseInt(cf.sysPoolFinishAddr2.value)*1000000+
+        parseInt(cf.sysPoolFinishAddr3.value)*1000+
+        parseInt(cf.sysPoolFinishAddr4.value);
+
+    var i,devices_len=staticIPItemArray.length;
+    var single_device,single_ip,single_value;
+
+    for(i=0;i<devices_len;i++)
+    {
+	    single_device=staticIPItemArray[i].split('<br>');
+	    if(single_device.length > 1)
+	    {
+		    single_ip=single_device[1].split('.');
+		    single_value=/*parseInt(single_ip[1])*1000000000+*/
+			    parseInt(single_ip[1])*1000000+
+			    parseInt(single_ip[2])*1000+
+			    parseInt(single_ip[3]);
+		    if(parseInt(single_ip[0])!=parseInt(cf.sysPoolStartingAddr1.value) )
+			    msg+="Reserved IP address "+single_device[1]+" is outside of the DHCP address range!\n";            
+		    else
+			    if((single_value<dhcpStart)|| (single_value>dhcpEnd))
+			    {
+				    msg+="Reserved IP address "+single_device[1]+" is outside of the DHCP address range!\n";            
+			    }
+	    }
+    }
+
+    
+  } 
+
+  if (msg.length > 1)
+  {
+    alert(msg);
+    return ;
+  }
+
+  dataToHidden(cf);
+
+  if (cf.dhcp_server.checked)
+  {
+    if (cp_ip(cf.sysPoolStartingAddr1,cf.sysPoolStartingAddr2,cf.sysPoolStartingAddr3,cf.sysPoolStartingAddr4,cf.sysPoolFinishAddr1,cf.sysPoolFinishAddr2,cf.sysPoolFinishAddr3,cf.sysPoolFinishAddr4))
+    {
+      msg += "End IP address of DHCP server cannot be lower than the starting IP address!";
+      alert(msg);
+      return ;
+    }
+    
+    if(!cp_ip(cf.sysPoolStartingAddr1,cf.sysPoolStartingAddr2,cf.sysPoolStartingAddr3,cf.sysPoolStartingAddr4,cf.sysLANIPAddr1,cf.sysLANIPAddr2,cf.sysLANIPAddr3,cf.sysLANIPAddr4)
+      && !cp_ip(cf.sysLANIPAddr1,cf.sysLANIPAddr2,cf.sysLANIPAddr3,cf.sysLANIPAddr4,cf.sysPoolFinishAddr1,cf.sysPoolFinishAddr2,cf.sysPoolFinishAddr3,cf.sysPoolFinishAddr4))
+    {
+      msg += "The DHCP IP pool cannot include the router's management page IP address!";
+      alert(msg);
+      return ;     
+    }
+
+    if(!cp_ip_mask(cf.sysLANIPAddr1,cf.sysLANIPAddr2,cf.sysLANIPAddr3, cf.sysPoolStartingAddr1,cf.sysPoolStartingAddr2,cf.sysPoolStartingAddr3, cf.sysPoolFinishAddr1,cf.sysPoolFinishAddr2,cf.sysPoolFinishAddr3))
+    {
+      msg += "The router's management page IP address is not consistent with the DHCP range selected!";
+      alert(msg);
+      return ;     
+    }
+  }
+
+
+  if ((cf.c4_sysLANSubnetMask.value) == false)
+  {
+    msg += "Invalid Subnet Mask value!";
+    alert(msg);
+    cf.sysLANSubnetMask1.value = 255;
+    cf.sysLANSubnetMask2.value = 255;
+    cf.sysLANSubnetMask3.value = 255;
+    cf.sysLANSubnetMask4.value = 0;
+    return ;
+  }
+  
+  return true;  
+}
+
+function checkEnableDhcp()
+{
+  var cf = document.forms[0];
+
+  if(cf.dhcp_server.checked)
+  {
+    cf.sysPoolStartingAddr1.disabled = false;
+    cf.sysPoolStartingAddr2.disabled = false;
+    cf.sysPoolStartingAddr3.disabled = false;
+    cf.sysPoolStartingAddr4.disabled = false;
+    cf.sysPoolFinishAddr1.disabled = false;
+    cf.sysPoolFinishAddr2.disabled = false;
+    cf.sysPoolFinishAddr3.disabled = false;
+    cf.sysPoolFinishAddr4.disabled = false;
+    setDhcpAddresses();
+  }
+  else
+  {   
+    cf.sysPoolStartingAddr1.disabled = true;
+    cf.sysPoolStartingAddr2.disabled = true;
+    cf.sysPoolStartingAddr3.disabled = true;
+    cf.sysPoolStartingAddr4.disabled = true;
+    cf.sysPoolFinishAddr1.disabled = true;
+    cf.sysPoolFinishAddr2.disabled = true;
+    cf.sysPoolFinishAddr3.disabled = true;
+    cf.sysPoolFinishAddr4.disabled = true;
+  }
+
+  return;
+}
+
+// Nk- Newly Added function below this point 
+
+function frmLoad() {
+var Ipaddr,Subnetmask;
+var Iptemp=new Array();
+var Subtemp=new Array();
+
+      Ipaddr = '<%ejGet(ethIpAddress)%>';
+      Subnetmask = '<%ejGet(ethSubnetMask)%>';
+      Iptemp=Ipaddr.split('.'); 
+      Subtemp=Subnetmask.split('.');   
+   with ( document.forms[0] ) {
+      //brName.value = 'Default';
+       sysLANIPAddr1.value=Iptemp[0];
+       sysLANIPAddr2.value=Iptemp[1];
+       sysLANIPAddr3.value=Iptemp[2];
+       sysLANIPAddr4.value=Iptemp[3];
+       
+       sysLANSubnetMask1.value=Subtemp[0];
+       sysLANSubnetMask2.value=Subtemp[1];
+       sysLANSubnetMask3.value=Subtemp[2];
+       sysLANSubnetMask4.value=Subtemp[3];  
+      // if protocol is Bridge or PPP IP extension
+      // then don't show DHCP info
+      if (proto == 'Bridge' || ipExt == '1')
+         hideDhcpInfo(1);
+      else {
+            hideDhcpInfo(0);
+         // if any protocol has NAT enabled then
+         // don't show DHCP relay
+            if ( dhcpEnbl == '1' ) {
+               enableDhcpSrv(1);
+           //    disableDhcpSrvRelay();
+            } else if ( dhcpEnbl == '2' ) {
+               hideDhcpInfo(1);
+            } else {
+               dhcp_server.checked = false;
+               hideDhcpInfo(1);
+            }
+       }
+   }
+}
+function enableDhcpSrv(loadaddr)
+{
+    var startadd = new Array();
+    var endaddr = new Array();
+    startadd = dhcpStart.split('.');
+    endaddr = dhcpEnd.split('.');
+    if (loadaddr == 0)
+    {
+        
+
+    }
+    else
+    {
+        with ( document.forms[0] ) {
+
+         sysPoolStartingAddr1.value = startadd[0];
+         sysPoolStartingAddr2.value = startadd[1];
+         sysPoolStartingAddr3.value = startadd[2];
+         sysPoolStartingAddr4.value = startadd[3];
+         sysPoolFinishAddr1.value = endaddr[0];
+         sysPoolFinishAddr2.value = endaddr[1];
+         sysPoolFinishAddr3.value = endaddr[2];
+         sysPoolFinishAddr4.value = endaddr[3]; 
+       }
+    }
+
+}
+function hideDhcpInfo(hide){
+var cf = document.forms[0];
+   if(hide == 1)
+   {
+    cf.sysPoolStartingAddr1.disabled = true;
+    cf.sysPoolStartingAddr2.disabled = true;
+    cf.sysPoolStartingAddr3.disabled = true;
+    cf.sysPoolStartingAddr4.disabled = true;
+    cf.sysPoolFinishAddr1.disabled = true;
+    cf.sysPoolFinishAddr2.disabled = true;
+    cf.sysPoolFinishAddr3.disabled = true;
+    cf.sysPoolFinishAddr4.disabled = true;
+
+   }
+   else
+   { 
+      cf.sysPoolStartingAddr1.disabled = false;
+      cf.sysPoolStartingAddr2.disabled = false;
+      cf.sysPoolStartingAddr3.disabled = false;
+      cf.sysPoolStartingAddr4.disabled = false;
+      cf.sysPoolFinishAddr1.disabled = false;
+      cf.sysPoolFinishAddr2.disabled = false;
+      cf.sysPoolFinishAddr3.disabled = false;
+      cf.sysPoolFinishAddr4.disabled = false;
+   } 
+   
+
+
+}
+function edit_save()
+{
+  var cf=document.forms[0];
+    if (radioSelectedIndex(cf.ruleSelect)<=-1) 
+ 	alert ('No entry selected. \nClick a radio button to select an entry.'); 
+    else 
+    {
+	  if_allow_submit=true; 
+	  document.forms[0].todo.value='mac_edit';
+	  document.forms[1].submit(); 
+    } 
+	
+
+}
+function delete_save()
+{
+  var cf=document.forms[0];
+	if (radioSelectedIndex(cf.ruleSelect)<=-1)
+	{
+	       if_allow_submit=false;
+		alert ('No entry selected. \nClick a radio button to select an entry.'); 
+	}
+	else 
+	{
+		if_allow_submit=true; 
+		document.forms[0].todo.value='mac_remove';
+        	var cf2=document.forms[2];
+		var ret1=confirm("In order to release the selected Reserved IP addresses immediately, a restart of the Sky Hub will be required. Select OK to restart the Sky Hub now or Cancel to do it later");
+		if(ret1==true)
+		{
+			cf2.todo.value="reboot";
+			stdAction(cf2, "reboot");
+		}
+		document.forms[2].submit();
+		return if_allow_submit;
+	}
+}
+function EditMode(){
+ var i;
+ var cf=document.forms[0];
+ 
+ for(i=0;i<cf.ruleSelect.length;i++)
+ {
+            if(cf.ruleSelect[i].checked==true)
+		break;		
+ }
+ 
+document.forms[1].editidx.value=i+1;
+//document.forms[2].mac.value=element[1];
+document.forms[2].index.value=i+1;
+}
+
+function checkStaticIpAdd()
+{
+	var cf = document.forms[0];
+
+	if(cf.staticIpCnt.value >= 50)//Address reservation maximum limit set to 50 entries
+		alert("Maximum Address reservation limit reached. Delete unwanted entries if possible");
+	else
+		window.location.href='sky_lan_ip_setup_addmac.html';
+}
+
+
+// done hiding-->
+</script>
+</head>
+<body onload="frmLoad();loadhelp('sstatus_w');">
+<!-- head -->
+<div id="head">
+  <div id="header">
+    <div class="layout"><span id="header-title"><a href="sky_index.html">Sky Hub</a></span><img src="assets/images/sky_logo.png" width="83" height="51" id="header-logo"/> </div>
+  </div>
+  <!-- nav -->
+  <div id="nav">
+    <div id="main-nav">
+      <div class="layout">
+        <ul id="topmenu">
+          <li><a id="wireless" href="sky_wireless_settings.html">Wireless</a></li>
+          <li><a id="security" href="sky_logs.html">Security</a></li>
+          <li><a id="maintenance" href="sky_router_status.html">Maintenance</a></li>
+          <li class="selected"><a id="advanced" href="sky_wan_setup.html">Advanced</a></li>
+          <li><a id="support" href="sky_support.html">Support</a></li>
+          <li><a id="licence" href="sky_license.html">Licensing Information</a></li>
+        </ul>
+        <a id="logout" href="sky_logout.html">Logout</a> </div>
+    </div>
+    <div id="sub-nav">
+      <div class="layout">
+        <ul id="submenu-wireless">
+          <li><a href="sky_wireless_settings.html">Wireless Settings</a></li>
+          <li><a href="sky_wireless_wps.html">Wireless WPS</a></li>
+        </ul>
+        <ul id="submenu-security">
+          <li><a href="sky_logs.html">Logs</a></li>
+          <li><a href="sky_block_sites.html">Block Sites</a></li>
+          <li><a href="sky_firewall_rules.html">Firewall Rules</a></li>
+          <li><a href="sky_services.html">Services</a></li>
+          <li><a href="sky_schedule.html">Schedule</a></li>
+        </ul>
+        <ul id="submenu-maintenance">
+          <li><a href="sky_router_status.html">Router Status</a></li>
+          <li><a href="sky_attached_devices.html">Attached Devices</a></li>
+          <li><a href="sky_backup_settings.html">Backup Settings</a></li>
+          <li><a href="sky_set_password.html">Set Password</a></li>
+          <li><a href="sky_diagnostics.html">Diagnostics</a></li>
+          <li><a href="sky_router_upgrade.html">Router Upgrade</a></li>
+        </ul>
+        <ul id="submenu-advanced" class="selected">
+          <li><a href="sky_wan_setup.html">WAN Setup</a></li>
+          <li><a href="sky_dynamic_dns.html">Dynamic DNS</a></li>
+          <li class="selected"><a href="sky_lan_ip_setup.html">LAN IP Setup</a></li>
+          <li><a href="sky_remote_management.html">Remote Management</a></li>
+          <li><a href="sky_upnp.html">UPnP</a></li>
+          <li><a href="sky_adv_extras.html">Extras</a></li>
+        </ul>
+        <ul id="submenu-support">
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- nav end -->
+</div>
+<!-- head end -->
+<!-- content -->
+<div id="content">
+  <!-- layout -->
+  <div class="layout">
+    <div id="content-header">
+      <div id="content-header-copy">
+        <h1>LAN TCP/IP Setup</h1>
+        <p class="black">Configure these settings if your network contains multiple routers.</p>
+        <p>If you make any changes to these settings you will need to restart your computer(s) and devices(s) for the settings to take effect.</p>
+      </div>
+      <div id="content-header-image"></div>
+      <br class="clear-break" />
+    </div>
+    <div id="content-body">
+      <!-- main-panel -->
+      <div class="main-panel">
+        <hr class="top" />
+        <form name="frmLan" method="post" action="sky_lan_ip_setup.sky" onsubmit="return check_if_allow_submit();">
+          <div class="section-heading">
+            <h3>LAN TCP/IP Setup</h3>
+            <a class="help-btn" href="#" name="help1">help</a></div>
+          <div class="row-holder">
+            <label class="w250">IP Address:</label>
+            <input name="sysLANIPAddr1" size="4" maxlength="3" value="192" onchange="setDhcpAddresses();" type="text"/>
+            .
+            <input name="sysLANIPAddr2" size="4" maxlength="3" value="168" onchange="setDhcpAddresses();" type="text"/>
+            .
+            <input name="sysLANIPAddr3" size="4" maxlength="3" value="0" onchange="setDhcpAddresses();" type="text"/>
+            .
+            <input name="sysLANIPAddr4" size="4" maxlength="3" value="1" onchange="setDhcpAddresses();" type="text"/>
+          </div>
+          <div class="row-holder">
+            <label class="w250">IP Subnet Mask:</label>
+            <input name="sysLANSubnetMask1" size="4" maxlength="3" value="255" onchange="setDhcpAddresses();" type="text"/>
+            .
+            <input name="sysLANSubnetMask2" size="4" maxlength="3" value="255" onchange="setDhcpAddresses();" type="text"/>
+            .
+            <input name="sysLANSubnetMask3" size="4" maxlength="3" value="255" onchange="setDhcpAddresses();" type="text"/>
+            .
+            <input name="sysLANSubnetMask4" size="4" maxlength="3" value="0" onchange="setDhcpAddresses();" type="text"/>
+            </div>
+          <hr />
+          <div class="row-holder">
+            <input checked="checked" name="dhcp_server" onchange="checkEnableDhcp()" type="checkbox"/>
+            <label class="right">Use Router as DHCP Server</label>
+            <a class="help-btn" href="#" name="help2">help</a> </div>
+          <div class="row-holder">
+            <label class="w250">Starting IP Address:</label>
+            <input name="sysPoolStartingAddr1" size="4" maxlength="3" value="192" type="text"/>
+            .
+            <input name="sysPoolStartingAddr2" size="4" maxlength="3" value="168" type="text"/>
+            .
+            <input name="sysPoolStartingAddr3" size="4" maxlength="3" value="0" type="text"/>
+            .
+            <input name="sysPoolStartingAddr4" size="4" maxlength="3" value="2" type="text"/>
+          </div>
+          <div class="row-holder">
+            <label class="w250">Ending IP Address:</label>
+            <input name="sysPoolFinishAddr1" size="4" maxlength="3" value="192" type="text"/>
+            .
+            <input name="sysPoolFinishAddr2" size="4" maxlength="3" value="168" type="text"/>
+            .
+            <input name="sysPoolFinishAddr3" size="4" maxlength="3" value="0" type="text"/>
+            .
+            <input name="sysPoolFinishAddr4" size="4" maxlength="3" value="254" type="text"/>
+          </div>
+          <hr />
+          <div class="section-heading">
+            <h3>Address Reservation</h3>
+            <a class="help-btn" href="#" name="help3">help</a></div>
+           <table style="" class="nospace" width="650" border="0" cellpadding="0" cellspacing="0">
+            <tbody>
+              <tr class="header">
+              	<td width="5%">&nbsp;</td>
+                <td width="5%">#</td>
+                <td>IP Address</td>
+                <td>Device Name</td>
+                <td>MAC Address</td>
+              </tr>
+              <%ejGetOther(sky_printstaticiplease)%>
+            </tbody>
+          </table>
+          <input name="todo" value="save" type="hidden"/>
+          <input name="this_file" value="sky_lan_ip_setup.html" type="hidden"/>
+          <input name="next_file" value="sky_lan_ip_setup.html" type="hidden"/>
+          <input name="c4_sysLANSubnetMask" value="255.255.255.0" type="hidden"/>
+          <input name="h_dhcp_server" value="enable" type="hidden"/>
+          <input name="c4_sysLANIPAddr" value="192.168.0.1" type="hidden"/>
+          <input name="c4_sysPoolStartingAddr" value="192.168.0.2" type="hidden"/>
+          <input name="c4_sysPoolFinishAddr" value="192.168.0.254" type="hidden"/>
+          <input name="this_file" value="sky_lan_ip_setup.html" type="hidden"/>
+          <input name="next_file" value="sky_lan_ip_setup.html" type="hidden"/>
+        </form>
+        <div class="buttons-holder"> <a href="javascript: if_allow_submit=false; checkStaticIpAdd(); /*window.location.href='sky_lan_ip_setup_addmac.html';*/" class="btn32 btn-silver png"><span class="png">Add</span></a> <a href="javascript: if_allow_submit=false; edit_save();" class="btn32 btn-silver png"><span class="png">Edit</span></a> <a href="javascript: if_allow_submit=false;delete_save();" class="btn32 btn-silver png"><span class="png">Delete</span></a> </div>
+        <form name="frmLan1" method="post" action="sky_lan_ip_setup_editmac.scgi" onsubmit="return if_allow_submit /*return check_if_allow_submit()*/;">
+          <input name="sessionKey" value="<%ejGetOther(sessionKey)%>" type="hidden"/>
+          <input name="editidx" value="" type="hidden"/>
+        </form>
+        <form name="frmLan2" method="post" action="sky_lanaddmac.sky" onsubmit="return delete_save();">
+          <input name="index" value="" type="hidden"/>
+          <input name="mac" value="" type="hidden"/>
+          <input name="action" value="remove" type="hidden"/>
+          <input name="todo" value="" type="hidden"/>
+          <input name="this_file" value="sky_lan_ip_setup.html" type="hidden"/>
+          <input name="next_file" value="sky_lan_ip_setup.html" type="hidden"/>
+        </form>
+        <!-- Server Start -->
+        <input name="h_sysRIPDirection" value="" type="hidden"/>
+        <input name="h_sysRIPVersion" value="" type="hidden"/>
+        <input name="h_ruleSelect" value="0" type="hidden"/>
+        <!-- Server End -->
+        <input name="todo" value="save" type="hidden"/>
+        <input name="this_file" value="sky_lan_ip_setup.html" type="hidden"/>
+        <input name="next_file" value="sky_lan_ip_setup.html" type="hidden"/>
+        <hr />
+        <div class="buttons-holder"> <a href="javascript: if_allow_submit=false; window.location.href='sky_lan_ip_setup.html'" class="btn42 btn-silver png"><span class="png">Cancel</span></a><a href="javascript: if_allow_submit=true; check_if_allow_submit();" class="btn42 btn-pink png"><span class="png">Apply</span></a></div>
+      </div>
+      <!-- main-panel end -->
+      <!-- side-panel -->
+      <div class="side-panel">
+        <!-- HELP 1 -->
+        <div class="pod pod-help" id="help1"><a href="#close" class="help-close"></a>
+          <div class="content">
+            <h3>LAN TCP/IP Setup</h3>
+            <p><b>IP Address:</b> Type the IP address of your Sky Hub, the factory default is: 192.168.0.1</p>
+            <p><b>IP Subnet Mask:</b> Your Sky Hub will automatically calculate the subnet mask based on the IP address that you assign. Unless you are implementing subnetting use 255.255.255.0 as the subnet mask.</p>
+          </div>
+          <span class="arrow arrow-l png"></span> </div>
+        <!-- HELP 2 -->
+        <div class="pod pod-help" id="help2"><a href="#close" class="help-close"></a>
+          <div class="content">
+            <h3>Use Your Sky Hub as a DHCP Server</h3>
+            <p>Your Sky Hub is set by default as a DHCP (Dynamic Host Configuration Protocol) Server, which provides the TCP/IP configuration for all the devices that are connected to it</p>
+            <p><b>Starting IP Address:</b> This box specifies the first of the contiguous addresses in the IP address pool. 192.168.0.2 is the default start address</p>
+            <p><b>Ending IP Address:</b> This box specifies the last of the contiguous addresses in the IP address pool. 192.168.0.254 is the default ending address</p>
+          </div>
+          <span class="arrow arrow-l png"></span> </div>
+        <!-- HELP 3 -->
+        <div class="pod pod-help" id="help3"><a href="#close" class="help-close"></a>
+          <div class="content">
+            <h3>Address Reservation</h3>
+            <p>When you specify a reserved IP address for a device on the LAN, that device will always receive the same IP address each time it accesses the DHCP server. Reserved IP addresses should be assigned to servers that require permanent IP settings.</p>
+            <p>To Reserve An IP Address:</p>
+            <ul>
+              <li>Select <b>Add</b></li>
+              <li>Select the <b>radio button</b> of the device you wish to add from the Address Reservation Table</li>
+              <li>If the device isn't on the Address Reservation Table enter the IP Address, MAC Address, and Device Name of the device you wish to add</li>
+              <li>Select <b>Add</b> when finished</li>
+            </ul>
+            <p>To Edit A Reserved IP Address:</p>
+            <ul>
+              <li>Select the radio button next to the reserved address you wish to edit</li>
+              <li>Select <b>Edit</b></li>
+            </ul>
+            <p>To edit the IP Address, MAC Address or Device Name:</p>
+            <ul>
+              <li>Select <b>Apply</b> when finished</li>
+            </ul>
+            <p>To Delete A Reserved IP Address</p>
+            <ul>
+              <li>Select the <b>radio button</b> next to the reserved address you wish to delete</li>
+              <li>Select <b>Delete</b></li>
+            </ul>
+          </div>
+          <span class="arrow arrow-l png"></span> </div>
+      </div>
+      <!-- side-panel end -->
+      <br class="clear-break" />
+    </div>
+  </div>
+  <!-- layout end -->
+</div>
+<!-- content end -->
+</div>
+</body>
+</html>

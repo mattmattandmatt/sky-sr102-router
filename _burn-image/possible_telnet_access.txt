@@ -1,0 +1,16 @@
+In your backup config, there is a command that is avaiable:
+
+<DslCpeConfig version="3.0">
+  <InternetGatewayDevice>
+	<X_BROADCOM_COM_AppCfg>
+
+	<TelnetdCfg>
+	  <NetworkAccess>LAN</NetworkAccess>
+	</TelnetdCfg>
+
+	</X_BROADCOM_COM_AppCfg>
+  </InternetGatewayDevice>
+</DslCpeConfig>
+
+
+Add TelnetdCfg and Restore the 'Settings', You maybe lucky ?

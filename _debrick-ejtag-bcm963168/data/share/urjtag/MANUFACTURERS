@@ -1,0 +1,51 @@
+#
+# $Id: MANUFACTURERS 1443 2009-02-26 21:38:59Z arniml $
+#
+# Manufacturer ID database
+# Copyright (C) 2002 ETC s.r.o.
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+#
+# Written by Marcel Telka <marcel@telka.sk>, 2002.
+#
+# Documentation:
+# [1] JEDEC Solid State Technology Association, "Standard Manufacturer's
+#     Identification Code", September 2001, Order Number: JEP106-K
+#
+
+# bits 11-1 of the Device Identification Register
+00000000110	lexra		Lexr
+00000000111	hitachi		Hitachi
+00000001001	intel		Intel
+00000001110	freescale	Freescale (Motorola)
+00000010101	philips		Philips Semi. (Signetics)
+00000010111	ti		Texas Instruments
+00000011000	toshiba		Toshiba
+00000011111	atmel		Atmel
+00000100001	lattice		Lattice Semiconductors
+00000100100	ibm		IBM Semiconductors
+00000110100	cypress		Cypress
+00000110101	dec		DEC
+00001001001	xilinx		Xilinx
+00001100101	analog		Analog Devices
+00001101110	altera		Altera
+00010101011	lattice		Lattice Semiconductors
+00010111111	broadcom	Broadcom
+00101010000	broadcom	Broadcom	# or "Sibyte, Incorporated" ?
+00101110000	brecis		Brecis (PMC-Sierra)
+00111101001	marvell		Marvell
+00110101011	marvell		Marvell
+11110000111	arm  		ARM

@@ -1,0 +1,351 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- v4.2 -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Sky Hub &gt; Remote Management</title>
+<link type="text/css" rel="stylesheet" href="assets/css/fonts.css"/>
+<link type="text/css" rel="stylesheet" href="assets/css/main.css"/>
+<!-- jh scripts start -->
+<script type="text/javascript" src="assets/js/libs/jquery/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="assets/js/libs/jquery/jquery.effects.core.js"></script>
+<!--[if LT IE 7]>
+			<script type="text/javascript" src="assets/js/libs/DD_belatedPNG_0.0.8a.js"></script>
+		<![endif]-->
+<script type="text/javascript" src="assets/js/utilities.js"></script>
+<script type="text/javascript" src="assets/js/libs/modernizr.touch.js"></script>
+<script type="text/javascript" src="assets/js/init.js"></script>
+<!-- jh scripts end -->
+<script type="text/javascript" src="assets/js/sky_utility.js"></script>
+<script type="text/javascript" src="assets/js/sky_linux.js"></script>
+<script type="text/javascript" src="assets/js/sky_script.js"></script>
+<script type="text/javascript">
+     <!--//
+var if_allow_submit=false;
+var remote_enable='<%ejGet(h_remote_mg)%>';
+var username='<%ejGet(adminUserName)%>';
+var defaultpassword='<%ejGetOther(isDefaultPassword,0,0)%>';
+
+function checkData()
+{
+ 	var cf = document.forms[0];
+	var msg = "";
+	var s1="Invalid IP address, please re-enter\n";
+	var ret = false;
+	var msg_changepassword = "Please change the default password before enabling the Remote Management feature. Select OK to change the Default password now or Cancel to do it later";  
+	if(cf.remote_mg.checked)
+	{
+		if(cf.rm_access[1].checked)
+		{
+			if(badIP(cf.rm_start_ip1,cf.rm_start_ip2,cf.rm_start_ip3,cf.rm_start_ip4,254))
+				msg+= s1;
+			if(badIP(cf.rm_finish_ip1,cf.rm_finish_ip2,cf.rm_finish_ip3,cf.rm_finish_ip4,254))
+				msg+= s1;
+            if(cp_ip(cf.rm_start_ip1,cf.rm_start_ip2,cf.rm_start_ip3,cf.rm_start_ip4,cf.rm_finish_ip1,cf.rm_finish_ip2,cf.rm_finish_ip3,cf.rm_finish_ip4))
+				msg+= "Starting IP Address must be less than the ending IP Address. \nPlease re-enter IP address\n";
+		}
+		if(cf.rm_access[0].checked)
+			if(badIP(cf.rm_ip1,cf.rm_ip2,cf.rm_ip3,cf.rm_ip4,254))
+				msg+= s1;
+		if(cf.remote_port.value=="0" || isNumeric(cf.remote_port,65534))
+			msg+= "Invalid port number, please re-enter";
+	}	
+	if (msg.length > 1)
+	{
+		alert(msg);
+		return ;
+	}
+
+	if (!(blankIP(cf.rm_start_ip1,cf.rm_start_ip2,cf.rm_start_ip3,cf.rm_start_ip4) ))
+		if(badIP(cf.rm_start_ip1,cf.rm_start_ip2,cf.rm_start_ip3,cf.rm_start_ip4,254))
+			msg+= s1;
+	if (!(blankIP(cf.rm_finish_ip1,cf.rm_finish_ip2,cf.rm_finish_ip3,cf.rm_finish_ip4) ))
+		if(badIP(cf.rm_finish_ip1,cf.rm_finish_ip2,cf.rm_finish_ip3,cf.rm_finish_ip4,254))
+			msg =  (msg.length > 2 ) ? msg : s1;
+	if (!(blankIP(cf.rm_ip1,cf.rm_ip2,cf.rm_ip3,cf.rm_ip4) ))
+			if(badIP(cf.rm_ip1,cf.rm_ip2,cf.rm_ip3,cf.rm_ip4,254))
+				msg =  (msg.length > 2 ) ? msg : s1;
+	if(cf.remote_port.value.length > 0 )
+		if(isNumeric(cf.remote_port,65535))
+			msg+= "Invalid port number, please re-enter";
+	
+	if (msg.length > 1)
+	{
+		alert(msg);
+		return ;
+	}
+
+	if(cf.remote_mg.checked && defaultpassword == "1" && remote_enable == "disable")
+	{
+		ret = confirm(msg_changepassword);
+        	if (ret == true)
+		{
+			window.location.href='sky_set_password.html';
+			if_allow_submit=false;
+			return;
+		}
+	}
+
+	dataToHidden(cf);
+	cf.submit();
+	return true;	
+}
+
+function set_ip_input(disableFlag,fields)
+{
+    var cf = document.forms[0];
+
+	for (var i = 1; i < set_ip_input.arguments.length; i++)
+		set_ip_input.arguments[i].disabled = disableFlag;
+}	
+
+function change_ip_input()
+{
+ 	var cf = document.forms[0];
+	if(cf.rm_access[0].checked)	
+	{
+		set_ip_input(false, cf.rm_ip1, cf.rm_ip2, cf.rm_ip3, cf.rm_ip4); 
+		set_ip_input(true, cf.rm_start_ip1, cf.rm_start_ip2, cf.rm_start_ip3, cf.rm_start_ip4, 
+			cf.rm_finish_ip1, cf.rm_finish_ip2, cf.rm_finish_ip3, cf.rm_finish_ip4);
+	}
+	else if(cf.rm_access[1].checked)
+	{
+		set_ip_input(true, cf.rm_ip1, cf.rm_ip2, cf.rm_ip3, cf.rm_ip4); 
+		set_ip_input(false, cf.rm_start_ip1, cf.rm_start_ip2, cf.rm_start_ip3, cf.rm_start_ip4, 
+			cf.rm_finish_ip1, cf.rm_finish_ip2, cf.rm_finish_ip3, cf.rm_finish_ip4);
+	}
+	else if(cf.rm_access[2].checked)
+	{
+		set_ip_input(true, cf.rm_ip1, cf.rm_ip2, cf.rm_ip3, cf.rm_ip4); 
+		set_ip_input(true, cf.rm_start_ip1, cf.rm_start_ip2, cf.rm_start_ip3, cf.rm_start_ip4, 
+			cf.rm_finish_ip1, cf.rm_finish_ip2, cf.rm_finish_ip3, cf.rm_finish_ip4);
+	}
+}
+
+function set_radio()
+{
+	var i;
+	var radio_length;
+    var cf = document.forms[0];
+
+	if("{remote_mng_rm_access}" == "ip_single")
+	{
+		set_ip_input(false, cf.rm_ip1, cf.rm_ip2, cf.rm_ip3, cf.rm_ip4); 
+		set_ip_input(true, cf.rm_start_ip1, cf.rm_start_ip2, cf.rm_start_ip3, cf.rm_start_ip4, 
+			cf.rm_finish_ip1, cf.rm_finish_ip2, cf.rm_finish_ip3, cf.rm_finish_ip4);
+	}
+	else if("{remote_mng_rm_access}" == "ip_range")
+	{
+		set_ip_input(true, cf.rm_ip1, cf.rm_ip2, cf.rm_ip3, cf.rm_ip4); 
+		set_ip_input(false, cf.rm_start_ip1, cf.rm_start_ip2, cf.rm_start_ip3, cf.rm_start_ip4, 
+			cf.rm_finish_ip1, cf.rm_finish_ip2, cf.rm_finish_ip3, cf.rm_finish_ip4);
+	}
+	else if("{remote_mng_rm_access}" == "all")
+	{
+		set_ip_input(true, cf.rm_ip1, cf.rm_ip2, cf.rm_ip3, cf.rm_ip4); 
+		set_ip_input(true, cf.rm_start_ip1, cf.rm_start_ip2, cf.rm_start_ip3, cf.rm_start_ip4, 
+			cf.rm_finish_ip1, cf.rm_finish_ip2, cf.rm_finish_ip3, cf.rm_finish_ip4);
+	}
+
+}
+
+     //-->
+   </script>
+</head>
+<body onload="set_radio();dataToVisible(document.forms[0]);change_ip_input();loadhelp('_rm');">
+<!-- head -->
+<div id="head">
+  <div id="header">
+    <div class="layout"><span id="header-title"><a href="sky_index.html">Sky Hub</a></span><img src="assets/images/sky_logo.png" width="83" height="51" id="header-logo"/> </div>
+  </div>
+  <!-- nav -->
+  <div id="nav">
+    <div id="main-nav">
+      <div class="layout">
+        <ul id="topmenu">
+          <li><a id="wireless" href="sky_wireless_settings.html">Wireless</a></li>
+          <li><a id="security" href="sky_logs.html">Security</a></li>
+          <li><a id="maintenance" href="sky_router_status.html">Maintenance</a></li>
+          <li class="selected"><a id="advanced" href="sky_wan_setup.html">Advanced</a></li>
+          <li><a id="support" href="sky_support.html">Support</a></li>
+          <li><a id="licence" href="sky_license.html">Licensing Information</a></li>
+        </ul>
+        <a id="logout" href="sky_logout.html">Logout</a> </div>
+    </div>
+    <div id="sub-nav">
+      <div class="layout">
+        <ul id="submenu-wireless">
+          <li><a href="sky_wireless_settings.html">Wireless Settings</a></li>
+          <li><a href="sky_wireless_wps.html">Wireless WPS</a></li>
+        </ul>
+        <ul id="submenu-security">
+          <li><a href="sky_logs.html">Logs</a></li>
+          <li><a href="sky_block_sites.html">Block Sites</a></li>
+          <li><a href="sky_firewall_rules.html">Firewall Rules</a></li>
+          <li><a href="sky_services.html">Services</a></li>
+          <li><a href="sky_schedule.html">Schedule</a></li>
+        </ul>
+        <ul id="submenu-maintenance">
+          <li><a href="sky_router_status.html">Router Status</a></li>
+          <li><a href="sky_attached_devices.html">Attached Devices</a></li>
+          <li><a href="sky_backup_settings.html">Backup Settings</a></li>
+          <li><a href="sky_set_password.html">Set Password</a></li>
+          <li><a href="sky_diagnostics.html">Diagnostics</a></li>
+          <li><a href="sky_router_upgrade.html">Router Upgrade</a></li>
+        </ul>
+        <ul id="submenu-advanced" class="selected">
+          <li><a href="sky_wan_setup.html">WAN Setup</a></li>
+          <li><a href="sky_dynamic_dns.html">Dynamic DNS</a></li>
+          <li><a href="sky_lan_ip_setup.html">LAN IP Setup</a></li>
+          <li class="selected"><a href="sky_remote_management.html">Remote Management</a></li>
+          <li><a href="sky_upnp.html">UPnP</a></li>
+          <li><a href="sky_adv_extras.html">Extras</a></li>
+        </ul>
+        <ul id="submenu-support">
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- nav end -->
+</div>
+<!-- head end -->
+<!-- content -->
+<div id="content">
+  <!-- layout -->
+  <div class="layout">
+    <div id="content-header">
+      <div id="content-header-copy">
+        <h1>Remote Management</h1>
+        <p class="black">Using the Remote Management menu, you can allow a user on the Internet to configure, upgrade and check the status of your Sky Hub</p>                             
+        <p><b>Important:</b> If you enable remote management it is advisable to change your Sky Hub default password to a very secure password</p>
+      </div>
+      <div id="content-header-image"></div>
+      <br class="clear-break" />
+    </div>
+    <div id="content-body">
+      <!-- main-panel -->
+      <div class="main-panel">
+        <hr class="top" />
+        <form name="remotemg" action="sky_remote_management.cgi" method="post" onsubmit="return if_allow_submit;">
+          <div class="row-holder">
+            <input name="remote_mg" value="remote_mg" type="checkbox"/>
+            <label class="right">Turn Remote Management On</label>
+            <a class="help-btn" href="#" name="help1">help</a> </div>
+          <hr />
+          <div class="section-heading">
+            <h3>Remote Management Address</h3>
+            <a class="help-btn" href="#" name="help2">help</a></div>
+          <div class="row-holder"> http://<%ejSky(remoteMgmtIpAddr)%>:<%ejGet(remote_port)%>
+          </div>
+          <hr />
+          <div class="section-heading">
+            <h3>Allow Remote Access By</h3>
+            <a class="help-btn" href="#" name="help3">help</a></div>
+          <div class="row-holder">
+            <input name="rm_access" value="ip_single" onclick="change_ip_input()" type="radio"/>
+            <label class="right">Only This Computer:</label>
+            <span class="abs250">
+            <input size="4" maxlength="3" name="rm_ip1" value="0" type="text"/>
+            .
+            <input size="4" maxlength="3" name="rm_ip2" value="0" type="text"/>
+            .
+            <input size="4" maxlength="3" name="rm_ip3" value="0" type="text"/>
+            .
+            <input size="4" maxlength="3" name="rm_ip4" value="0" type="text"/>
+            </span> </div>
+          <div class="row-holder">
+            <input name="rm_access" value="ip_range" onclick="change_ip_input()" type="radio"/>
+            <label class="right">IP Address Range:</label>
+            <span class="abs200">From</span> <span class="abs250">
+            <input size="4" maxlength="3" name="rm_start_ip1" value="0" type="text"/>
+            .
+            <input size="4" maxlength="3" name="rm_start_ip2" value="0" type="text"/>
+            .
+            <input size="4" maxlength="3" name="rm_start_ip3" value="0" type="text"/>
+            .
+            <input size="4" maxlength="3" name="rm_start_ip4" value="0" type="text"/>
+            </span> </div>
+          <div class="row-holder">
+            <label class="right">&nbsp;</label>
+            <span class="abs200">To</span> <span class="abs250">
+            <input size="4" maxlength="3" name="rm_finish_ip1" value="0" type="text"/>
+            .
+            <input size="4" maxlength="3" name="rm_finish_ip2" value="0" type="text"/>
+            .
+            <input size="4" maxlength="3" name="rm_finish_ip3" value="0" type="text"/>
+            .
+            <input size="4" maxlength="3" name="rm_finish_ip4" value="0" type="text"/>
+            </span> </div>
+          <div class="row-holder">
+            <input checked="checked" name="rm_access" value="all" onclick="change_ip_input()" type="radio"/>
+            <label class="right">Everyone</label>
+          </div>
+          <hr />
+          <div class="row-holder">
+            <label class="w250">Port Number:</label>
+            <input name="remote_port" value="<%ejGet(remote_port)%>" size="6" type="text"/>
+            <a class="help-btn" href="#" name="help4">help</a> </div>
+          <input name="todo" value="save" type="hidden"/>
+          <input name="sessionKey" value="<%ejGetOther(sessionKey)%>" type="hidden"/>
+          <input name="this_file" value="sky_remote_management.html" type="hidden"/>
+          <input name="next_file" value="sky_remote_management.html" type="hidden"/>
+          <!-- ServerStart -->
+          <input name="c4_rm_ip" value="<%ejGet(c4_rm_ip)%>" type="hidden"/>
+          <input name="c4_rm_start_ip" value="<%ejGet(c4_rm_start_ip)%>" type="hidden"/>
+          <input name="c4_rm_finish_ip" value="<%ejGet(c4_rm_finish_ip)%>" type="hidden"/>
+          <input name="h_remote_mg" value="<%ejGet(h_remote_mg)%>" type="hidden"/>
+          <input name="h_rm_access" value="<%ejGet(h_rm_access)%>" type="hidden"/>
+          <!-- ServerEnd -->
+        </form>
+        <hr />
+        <div class="buttons-holder"> <a href="javascript: if_allow_submit=false; location.href='sky_remote_management.html'" class="btn42 btn-silver png"><span class="png">Cancel</span></a><a href="javascript: if_allow_submit=true; checkData();" class="btn42 btn-pink png"><span class="png">Apply</span></a></div>
+      </div>
+      <!-- main-panel end -->
+      <!-- side-panel -->
+      <div class="side-panel">
+        <!-- HELP 1 -->
+        <div class="pod pod-help" id="help1"><a href="#close" class="help-close"></a>
+          <div class="content">
+            <h3>Turn Remote Management On</h3>
+            <ul>
+              <li>Select the <b>check box</b> to Turn Remote Management On</li>
+              <li>Select <b>Apply</b> to save changes</li>
+            </ul>
+          </div>
+          <span class="arrow arrow-l png"></span> </div>
+        <!-- HELP 2 -->
+        <div class="pod pod-help" id="help2"><a href="#close" class="help-close"></a>
+          <div class="content">
+            <h3>Remote Management Address</h3>
+            <p>This is the current address you will use when accessing your Sky Hub from the Internet. To access the Sky Hub remotely type your Sky Hub's WAN IP address into your browser's Address or Location bar, followed by a colon (:) and the custom port number. e.g. if your external address is 10.0.0.123 and you use port number 8080, enter http://10.0.0.123:8080</p>
+          </div>
+          <span class="arrow arrow-l png"></span> </div>
+        <!-- HELP 3 -->
+        <div class="pod pod-help" id="help3"><a href="#close" class="help-close"></a>
+          <div class="content">
+            <h3>Allow Remote Access By</h3>
+            <p>For security, you should restrict access to as few external IP addresses as practical</p>
+            <ul>
+              <li>Select <b>Only This Computer</b> to allow access by only one IP address</li>
+              <li>Select <b>IP Address Range</b> to allow access from a range of IP addresses on the Internet, enter a beginning and ending IP address to define the allowed range</li>
+              <li>Select <b>Everyone</b> to allow access by everyone on the Internet</li>
+            </ul>
+          </div>
+          <span class="arrow arrow-l png"></span> </div>
+        <!-- HELP 4 -->
+        <div class="pod pod-help" id="help4"><a href="#close" class="help-close"></a>
+          <div class="content">
+            <h3>Port Number</h3>
+            <p>Web browser access normally uses the standard HTTP service port 80. For greater security, you can change the remote management web interface to a custom port by entering that number in the box provided. Choose a number between 1 and 65534, but don't use the number of any common service port</p></div>
+          <span class="arrow arrow-l png"></span> </div>
+      </div>
+      <!-- side-panel end -->
+      <br class="clear-break" />
+    </div>
+  </div>
+  <!-- layout end -->
+</div>
+<!-- content end -->
+</div>
+</body>
+</html>
