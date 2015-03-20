@@ -22,7 +22,7 @@ chmod 0777 ./burn_whole_image
 ./burn_whole_image danger SR102-whole-image-XXXX.bin
 
 
-# This preserves original your serialisation/nvram data.
+# This preserves your original serialisation/nvram data.
 # It may crash/oops after its finished burning, dont worry, it will reset either way.
 
 
