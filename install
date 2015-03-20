@@ -49,8 +49,11 @@ echo ""
 echo "*** Last part, Root is required to copy the MIPS Toolchain 4.4.2 ***"
 echo "***      in /opt/toolchains/uclibc-crosstools-gcc-4.4.2-1/       ***"
 echo ""
+echo "***      And to install the standard Packages flex & bison       ***"
+echo ""
 cd /
 sudo tar -xf $master_dir/../uclibc_crosstools.tar.gz
+sudo apt-get install flex bison
 
 
 echo ""
