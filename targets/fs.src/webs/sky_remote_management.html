@@ -88,7 +88,7 @@ function checkData()
 
 	dataToHidden(cf);
 	cf.submit();
-	return true;	
+	return true;
 }
 
 function set_ip_input(disableFlag,fields)
@@ -245,35 +245,26 @@ function set_radio()
             <input name="rm_access" value="ip_single" onclick="change_ip_input()" type="radio"/>
             <label class="right">Only This Computer:</label>
             <span class="abs250">
-            <input size="4" maxlength="3" name="rm_ip1" value="0" type="text"/>
-            .
-            <input size="4" maxlength="3" name="rm_ip2" value="0" type="text"/>
-            .
-            <input size="4" maxlength="3" name="rm_ip3" value="0" type="text"/>
-            .
+            <input size="4" maxlength="3" name="rm_ip1" value="0" type="text"/> .
+            <input size="4" maxlength="3" name="rm_ip2" value="0" type="text"/> .
+            <input size="4" maxlength="3" name="rm_ip3" value="0" type="text"/> .
             <input size="4" maxlength="3" name="rm_ip4" value="0" type="text"/>
             </span> </div>
           <div class="row-holder">
             <input name="rm_access" value="ip_range" onclick="change_ip_input()" type="radio"/>
             <label class="right">IP Address Range:</label>
             <span class="abs200">From</span> <span class="abs250">
-            <input size="4" maxlength="3" name="rm_start_ip1" value="0" type="text"/>
-            .
-            <input size="4" maxlength="3" name="rm_start_ip2" value="0" type="text"/>
-            .
-            <input size="4" maxlength="3" name="rm_start_ip3" value="0" type="text"/>
-            .
+            <input size="4" maxlength="3" name="rm_start_ip1" value="0" type="text"/> .
+            <input size="4" maxlength="3" name="rm_start_ip2" value="0" type="text"/> .
+            <input size="4" maxlength="3" name="rm_start_ip3" value="0" type="text"/> .
             <input size="4" maxlength="3" name="rm_start_ip4" value="0" type="text"/>
             </span> </div>
           <div class="row-holder">
             <label class="right">&nbsp;</label>
             <span class="abs200">To</span> <span class="abs250">
-            <input size="4" maxlength="3" name="rm_finish_ip1" value="0" type="text"/>
-            .
-            <input size="4" maxlength="3" name="rm_finish_ip2" value="0" type="text"/>
-            .
-            <input size="4" maxlength="3" name="rm_finish_ip3" value="0" type="text"/>
-            .
+            <input size="4" maxlength="3" name="rm_finish_ip1" value="0" type="text"/> .
+            <input size="4" maxlength="3" name="rm_finish_ip2" value="0" type="text"/> .
+            <input size="4" maxlength="3" name="rm_finish_ip3" value="0" type="text"/> .
             <input size="4" maxlength="3" name="rm_finish_ip4" value="0" type="text"/>
             </span> </div>
           <div class="row-holder">
@@ -283,7 +274,7 @@ function set_radio()
           <hr />
           <div class="row-holder">
             <label class="w250">Port Number:</label>
-            <input name="remote_port" value="<%ejGet(remote_port)%>" size="6" type="text"/>
+            <input name="remote_port" value="<%ejGet(remote_port)%>" size="6" type="text"/> &nbsp; (Do not use 8080)
             <a class="help-btn" href="#" name="help4">help</a> </div>
           <input name="todo" value="save" type="hidden"/>
           <input name="sessionKey" value="<%ejGetOther(sessionKey)%>" type="hidden"/>
@@ -317,7 +308,7 @@ function set_radio()
         <div class="pod pod-help" id="help2"><a href="#close" class="help-close"></a>
           <div class="content">
             <h3>Remote Management Address</h3>
-            <p>This is the current address you will use when accessing your Sky Hub from the Internet. To access the Sky Hub remotely type your Sky Hub's WAN IP address into your browser's Address or Location bar, followed by a colon (:) and the custom port number. e.g. if your external address is 10.0.0.123 and you use port number 8080, enter http://10.0.0.123:8080</p>
+            <p>This is the current address you will use when accessing your Sky Hub from the Internet. To access the Sky Hub remotely type your Sky Hub's WAN IP address into your browser's Address or Location bar, followed by a colon (:) and the custom port number. e.g. if your external address is 10.0.0.123 and you use port number 8081, enter http://10.0.0.123:8081</p>
           </div>
           <span class="arrow arrow-l png"></span> </div>
         <!-- HELP 3 -->

@@ -179,7 +179,7 @@ ln -s /var/ppp/pppmsg $ROOTFS/etc/pppmsg
 ln -s /var/fyi/sys/dns $ROOTFS/etc/resolv.conf
 ln -s /var/fyi/sys/gateway $ROOTFS/etc/gateway.conf
 ln -s /var/udhcpd/udhcpd.conf $ROOTFS/etc/udhcpd.conf
-ln -s /var/auxfs/udhcpd.leases $ROOTFS/etc/udhcpd.leases
+#ln -s /var/auxfs/udhcpd.leases $ROOTFS/etc/udhcpd.leases
 ln -s /var/dms.conf $ROOTFS/etc/dms.conf
 ln -s /var/ipsec/ipsec.conf $ROOTFS/etc/ipsec.conf
 ln -s /var/ipsec/racoon.conf $ROOTFS/etc/racoon.conf
@@ -334,14 +334,20 @@ tar --delete -f filesystem.tar './bin/tr69c'
 tar --delete -f filesystem.tar './bin/fus'
 tar --delete -f filesystem.tar './bin/factory'
 tar --delete -f filesystem.tar './bin/tinyproxy'
-#tar --delete -f filesystem.tar './bin/skyanytimeupnp'
+tar --delete -f filesystem.tar './bin/skyanytimeupnp'
 #tar --delete -f filesystem.tar './bin/skyhealthmonitor'
 #tar --delete -f filesystem.tar './bin/skyselfheal'
 #tar --delete -f filesystem.tar './bin/skytest'
+tar --delete -f filesystem.tar './bin/tcpdump'
 tar --delete -f filesystem.tar './etc/init.d/rcS'
+tar --delete -f filesystem.tar './etc/udhcpd.leases'
 
+tar --delete -f filesystem.tar './webs/sky_index.html'
+tar --delete -f filesystem.tar './webs/sky_router_status.html'
+tar --delete -f filesystem.tar './webs/sky_st_poe.html'
 tar --delete -f filesystem.tar './webs/sky_dynamic_dns.html'
 tar --delete -f filesystem.tar './webs/sky_lan_ip_setup.html'
+tar --delete -f filesystem.tar './webs/sky_license.html'
 tar --delete -f filesystem.tar './webs/sky_remote_management.html'
 tar --delete -f filesystem.tar './webs/sky_router_upgrade.html'
 tar --delete -f filesystem.tar './webs/sky_upnp.html'

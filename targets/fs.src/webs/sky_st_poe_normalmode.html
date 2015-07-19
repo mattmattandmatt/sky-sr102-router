@@ -1,0 +1,265 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- v4.2 -->
+<!-- OPENS via refresh from sky_wanstat.html -->
+<!-- SHOULD OPEN IN WINDOW width=650,height=450 --> 
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Sky Hub &gt; Connection Status</title>
+<link type="text/css" rel="stylesheet" href="assets/css/fonts.css"/>
+<link type="text/css" rel="stylesheet" href="assets/css/main.css"/>
+<!-- jh scripts start -->
+<script type="text/javascript" src="assets/js/libs/jquery/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="assets/js/libs/jquery/jquery.effects.core.js"></script>
+<!--[if LT IE 7]>
+			<script type="text/javascript" src="assets/js/libs/DD_belatedPNG_0.0.8a.js"></script>
+		<![endif]-->
+<script type="text/javascript" src="assets/js/utilities.js"></script>
+<script type="text/javascript" src="assets/js/libs/modernizr.touch.js"></script>
+<script type="text/javascript" src="assets/js/init.js"></script>
+<!-- jh scripts end -->
+<script type="text/javascript" src="assets/js/sky_utility.js"></script>
+<script type="text/javascript" src="assets/js/sky_linux.js"></script>
+<script type="text/javascript" src="assets/js/sky_script.js"></script>
+<!--[if IE 6]><script   type="text/javascript" src="assets/js/sky_minmax.js"></script><![endif]-->
+<script   type="text/javascript">
+<!--//
+var if_allow_submit=false;
+var defaultInterval = 5;
+var interval = 5;
+
+
+    function GetCookieVal(offset) {
+        var endstr = document.cookie.indexOf (";", offset);
+        if (endstr == -1)
+          endstr = document.cookie.length;
+        return unescape(document.cookie.substring(offset, endstr));
+    }
+          
+    function SetCookie(name, value) {
+        var expdate = new Date();
+        var argv = SetCookie.arguments;
+        var argc = SetCookie.arguments.length;
+        var expires = (argc > 2) ? argv[2] : null;
+        var path = (argc > 3) ? argv[3] : null;
+        var domain = (argc > 4) ? argv[4] : null;
+        var secure = (argc > 5) ? argv[5] : false;
+        if(expires!=null) expdate.setTime(expdate.getTime() + ( expires * 1000 ));
+        document.cookie = name + "=" + escape (value) +((expires == null) ? "" : ("; expires="+ expdate.toGMTString()))
+        +((path == null) ? "" : ("; path=" + path)) +((domain == null) ? "" : ("; domain=" + domain))
+        +((secure == true) ? "; secure" : "");
+    }
+          
+    function DelCookie(name) {
+        var exp = new Date();
+        exp.setTime (exp.getTime() - 1);
+        var cval = GetCookie (name);
+        document.cookie = name + "=" + cval + "; expires="+ exp.toGMTString();
+    }
+          
+    function GetCookie(name) {
+        var arg = name + "=";
+        var alen = arg.length;
+        var clen = document.cookie.length;
+        var i = 0;
+        while (i < clen)
+        {
+               var j = i + alen;
+               if (document.cookie.substring(i, j) == arg)
+               return GetCookieVal (j);
+               i = document.cookie.indexOf(" ", i) + 1;
+               if (i == 0) break;
+        }
+        return null;
+    }
+
+    function loadInterval()
+    {
+        interval=GetCookie("connection_status_interval");
+        if (interval==null)
+        {
+               interval=defaultInterval;
+               SetCookie("connection_status_interval", interval);
+        }
+        else
+        {
+              defaultInterval = interval;
+              document.forms[0].interval.value=interval;
+        }
+        intervalId = setInterval("getConnectionStatusPage()", interval * 1000);
+        intervalId2 = setInterval("setDefaultInterval()", 5);
+    }
+    
+    function setDefaultInterval()
+    {
+        //document.SetIntervalForm.interval.value = defaultInterval ;
+        document.forms[0].interval.value = defaultInterval ;
+        SetCookie("connection_status_interval", defaultInterval);
+        clearInterval(intervalId2) ;
+    }
+
+    function resetInterval(newInterval)
+    {
+        interval = parseInt(newInterval);
+        if ( isNaN(interval) || interval< 1 )
+            interval = defaultInterval;
+        document.forms[0].interval.value = interval ;
+        SetCookie("connection_status_interval", interval);
+        clearInterval(intervalId) ;
+        intervalId = setInterval("getConnectionStatusPage()", interval * 1000);
+    }
+
+   function getConnectionStatusPage()
+    {
+        myTitle = "Connection Status" ;
+        window.location.href = "sky_st_poe.html" ;
+    }
+        
+ //-->
+</script>
+</head>
+<!--onload="loadInterval();">-->
+<body onload="loadInterval();" >
+<div style="width:650px; height:450px; padding:20px;">
+  <div class="section-heading">
+    <h3>Connection Status</h3>
+		<a href="javascript: if_allow_submit=false; self.close();" class="link link-close right">Close</a>
+  </div>
+  <form name="poe_st" method="post" action="sky_st_poe.sky" onsubmit="return if_allow_submit;">
+    <script type="text/javascript">
+    <!--hide
+    var wanStatus = '<%ejGet(wanStatus)%>';
+    var wanOEstat = '<%ejGet(wanoeStatus)%>';
+    var wanarr = wanStatus.split('_');
+    var wanOEarr = wanOEstat.split('_');
+    var WanLstat = '<%ejGet(Wlinkstat)%>';
+	var WanOEconn_stat = WanLstat.split('_');
+    var Modem_stat = '<%ejGet(Mlinkstat)%>';
+    var routerMode = '<%ejGet(wanMode)%>';
+    if_allow_submit = false;
+    
+    if(wanOEarr[0] != "&nbsp;") {
+        document.write('<div class="row-holder"> <span class="label w250">Connection Time</span><span>');
+        document.write(wanOEarr[9]);
+        document.write('</span></div>');
+    
+        document.write('<div class="row-holder"> <span class="label w250">Connecting to Server</span><span>');
+        if(WanOEconn_stat[0] == "Disconnected") {
+            if( routerMode == "WANOE" )
+            {    
+                document.write('WANoE down');
+            }
+            else
+            {
+                document.write('DSL down');
+            }
+            document.write('</span></div>');
+        } else {
+            document.write(WanOEconn_stat[0]);
+            document.write('</span></div>');
+    
+            document.write('<div class="row-holder"> <span class="label w250">Negotiation</span><span>');
+            document.write('WANOE');
+            document.write('</span></div>');
+    
+            document.write('<div class="row-holder"> <span class="label w250">Authentication</span><span>');
+            document.write('AUTO');
+            document.write('</span></div>');
+    
+            document.write('<div class="row-holder"> <span class="label w250">IP Address</span><span>');
+            document.write(wanOEarr[3]);
+            document.write('</span></div>');
+    
+            document.write('<div class="row-holder"> <span class="label w250">Network Mask</span><span>');
+            document.write(wanOEarr[5]);
+            document.write('</span></div>');
+        }
+    } else if(wanarr[0] != '&nbsp;' || Modem_stat != 'Disconnected') {
+        document.write('<div class="row-holder"> <span class="label w250">Connection Time</span><span>');
+        document.write(wanarr[11]);
+        document.write('</span></div>');
+    
+        document.write('<div class="row-holder"> <span class="label w250">Connecting to Server</span><span>');
+        document.write(Modem_stat);
+        document.write('</span></div>');
+    
+        document.write('<div class="row-holder"> <span class="label w250">Negotiation</span><span>');
+        document.write();
+    
+        switch(wanarr[1]) {
+            case "bridge":
+                document.write('BRIDGE');
+                break;
+            case "pppoa":
+                document.write('PPPoA');
+                break;
+            case "pppoe":
+                document.write('PPPoE');
+                break;
+            case "ipoa":
+                document.write('IPoA');
+                break;
+            case "ipoe":
+                document.write('MER');
+                break;
+            default:
+                document.write('---');
+        }
+        document.write('</span></div>');
+    
+        document.write('<div class="row-holder"> <span class="label w250">Authentication</span><span>');
+		document.write('AUTO');
+		document.write('</span></div>');
+    
+        document.write('<div class="row-holder"> <span class="label w250">IP Address</span><span>');
+        document.write(wanarr[5]);
+        document.write('</span></div>');
+    
+        document.write('<div class="row-holder"> <span class="label w250">Network Mask</span><span>');
+        document.write(wanarr[7]);
+        document.write('</span></div>');
+    
+    } else {
+        document.write('<div class="row-holder"> <span class="label w250">Connection Time</span><span>');
+        document.write('00:00:00');
+        document.write('</span></div>');
+    
+        document.write('<div class="row-holder"> <span class="label w250">Connecting to Server</span><span>');
+        if(WanOEconn_stat[0] == "Disconnected" || Modem_stat == "Disconnected") {
+            if( routerMode == "WANOE" )
+            {
+                document.write('WANoE down');
+            }
+            else
+            {
+                document.write('DSL down');
+            }
+            document.write('</span></div>');
+        } else {
+            document.write(WanOEconn_stat[0]);
+            document.write('</span></div>');
+    
+            document.write('<div class="row-holder"> <span class="label w250">IP Address</span><span>');
+            document.write('---');
+            document.write('</span></div>');
+    
+            document.write('<div class="row-holder"> <span class="label w250">Network Mask</span><span>');
+            document.write('---');
+            document.write('</span></div>');
+    
+        }
+    }
+    // done hiding -->
+    </script>
+      <input name="interval" size="4" maxlength="4" value="5" type="hidden">
+    <input name="todo" value="reload" type="hidden"/>
+    <input name="this_file" value="sky_st_poe.html" type="hidden"/>
+    <input name="next_file" value="sky_st_poe.html" type="hidden"/>
+  </form>
+  <div class="buttons-holder">
+	<a href="javascript: if_allow_submit=true; stdAction(document.forms[0],'disconnect');" {dial_up_down_enable} class="btn32 btn-silver png"><span class="png">Disconnect</span></a>
+	<a href="javascript: if_allow_submit=true; stdAction(document.forms[0],'connect');" {dial_up_down_enable} class="btn32 btn-pink png"><span class="png">Connect</span></a>
+	</div>
+</div>
+</body>
+</html>

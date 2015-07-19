@@ -2,6 +2,7 @@ Write Firmware on the Sky Router SR102
 ---------------------------------------
 
 Connect TTL Serial port to pins 1(optional),2,3,4   (or telnet)
+ > Refer to the .pdf for Serial Port connection ideas
 Backup current Settings
 start a http miniweb server
 
@@ -46,9 +47,10 @@ echo i > /proc/sysrq-trigger
 
 # Backup the current Firmware, Config or File
 # start a ftpd server
-ftpput -u 123 -p 123 192.168.0.2 mtd0.squashfs /dev/mtdblock0
-ftpput -u 123 -p 123 192.168.0.2 mtd1.jffs2    /dev/mtdblock1
-ftpput -u 123 -p 123 192.168.0.2 entire.flash  /dev/mtdblock6
+ftpput -u 123 -p 123 192.168.0.2 bootloader.cfe /dev/mtdblock2
+ftpput -u 123 -p 123 192.168.0.2 mtd0.squashfs  /dev/mtdblock0
+ftpput -u 123 -p 123 192.168.0.2 mtd1.jffs2     /dev/mtdblock1
+ftpput -u 123 -p 123 192.168.0.2 entire.flash   /dev/mtdblock5
 
 
 

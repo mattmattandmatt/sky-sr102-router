@@ -1,4 +1,5 @@
 # /etc/profile: system-wide .profile file for the Bourne shells
+echo C > /dev/console
 trap "" 2
 
 export PATH=/opt/bin:/bin:/sbin:/usr/bin:/usr/sbin:/opt/scripts
@@ -10,9 +11,10 @@ KERNELVER=2.6.30
 # change the 0 to the number of seconds, e.g. 300.
 export TMOUT=0
 
+echo D > /dev/console
 echo 
-firsttime=`echo /var/auxfs/udhcpd.lease*`
-if [ "$firsttime" = "/var/auxfs/udhcpd.lease*" ]; then
+firsttime=`echo /var/firsttimeru*`
+if [ "$firsttime" = "/var/firsttimeru*" ]; then
  echo "Loading drivers and kernel modules..... "
  echo
 # no-op
@@ -22,7 +24,7 @@ if [ "$firsttime" = "/var/auxfs/udhcpd.lease*" ]; then
  mkdir -p /var/log /var/auxfs /var/run /var/state/dhcp /var/ppp /var/udhcpd /var/zebra /var/siproxd /var/cache /var/tmp /var/samba /var/samba/share /var/samba/homes /var/samba/private /var/samba/locks
  cp  /etc/smb.conf /var/samba/ 2>/dev/null
 
- echo > /var/auxfs/udhcpd.leases
+ echo > /var/firsttimerun
 export VALGRIND_LIB=/lib/valgrind/
  ifconfig lo 127.0.0.1 netmask 255.0.0.0 broadcast 127.255.255.255 up
 # /etc/modules_install /lib/modules/$KERNELVER/extra
@@ -86,9 +88,12 @@ export VALGRIND_LIB=/lib/valgrind/
  # dumpsysinfo.sh, then save a copy of bootup messages for dumping later
  test -e /opt/scripts/dumpsysinfo.sh && /bin/dmesg > /var/tmp/bootupmessages
 
- mount -t jffs2 /dev/mtdblock1 /var/auxfs
+# mount -t jffs2 /dev/mtdblock1 /var/auxfs
  # As final step in system bootup, start smd, which will start configuration
  # management system (CMS)
  ethswctl -c pause -p 8 -v 3
+
+ dsldetails 8080
+ dhcpbridge
  smd
 fi

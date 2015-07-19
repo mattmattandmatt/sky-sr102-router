@@ -84,57 +84,20 @@
 		<iframe src="" seamless border="0" name="dsldetails" height="200" width="365"></iframe>
 		<p>I'm sorry, but you need to <a href="sky_diagnostics.html">reboot</a> for the changes to take affect</p>
         <p>After changing the values, check your speed and service provider name:</p>
-		<p><a href="http://www.speedtest.net">http://www.speedtest.net</a></p>
-		<p><a href="http://www.broadbandspeedchecker.co.uk">http://www.broadbandspeedchecker.co.uk</a></p>
-		<p>( Uses PPP, ATM - PVC:0/38 )</a>
+		<p><a href="http://www.speedtest.net">http://www.speedtest.net</a> &nbsp; &amp; &nbsp;
+		   <a href="http://www.broadbandspeedchecker.co.uk">http://www.broadbandspeedchecker.co.uk</a></p>
+		<p>( Uses ATM - PVC:0/38, PPPoA )</a>
 		<br><br>
+        <h1>ADSL Bridge Mode</h1>
+		<form id="frmbridgeid" method="post" action="" target="bridgemode">
+		<input name="action" value="getids" type="hidden"></form>
+		<iframe src="" seamless border="0" name="bridgemode" height="310" width="580"></iframe>
+		These bridge modes take affect after it re/connects to the Internet, by overriding Sky's settings.
+		<br><br><br>
         <h1>Other Configuration Menu</h1>
-        <p>Some of these are advanced features, and some do not work.</p>
+        <p>Some of these are advanced features, and some do not work after a reboot.</p>
         <a href="main.html"><p class="black">&gt; Main Broadcom Configuration &lt;</p></a>
-		<br><br>
-        <h3>Some of the Links on the above menu</h3>
-		<a href="wancfg.html"><p class="black">&gt; WAN IP Config</p></a>
-		<a href="ipsconfig.html"><p class="black">&gt; IPsec Config</p></a>
-		<a href="ipv6lancfg.html"><p class="black">&gt; IP6 Config</p></a>
-        <a href="pppoe.html"><p class="black">&gt; Change the PPP Username / Password (Can't get working)</p></a>
 		<br>
-        <a href="adslcfg.html"><p class="black">&gt; DSL Modulation Type</p></a>
-        <a href="adslcfgadv.html"><p class="black">&gt; DSL Modulation Test</p></a>
-        <a href="adslcfgtone.html"><p class="black">&gt; DSL Tone Test</p></a>
-        <a href="berstart.html"><p class="black">&gt; Bit Error Rate Test</p></a>
-		<br>
-        <a href="dslbondingcfg.html"><p class="black">&gt; DSL Bonding Capability</p></a>
-        <a href="enblbridge.html"><p class="black">&gt; Enable/Disable Bridging</p></a>
-        <a href="enblservice.html"><p class="black">&gt; Enable/Disable IGMP</p></a>
-		<br>
-        <a href="cfgatm.html"><p class="black">&gt; ATM PVC Config</p></a>
-        <a href="cfgeth.html"><p class="black">&gt; Ethernet WAN Port Config</p></a>
-        <a href="cfgepon.html"><p class="black">&gt; EPON WAN Port Config</p></a>
-        <a href="cfggpon.html"><p class="black">&gt; GPON WAN Port Config</p></a>
-        <a href="cfgmoca.html"><p class="black">&gt; MoCA WAN Port Config</p></a>
-		<br>
-        <a href="cfgl2tpac.html"><p class="black">&gt; Add L2TP PPP Connection</p></a>
-        <a href="cfgptm.html"><p class="black">&gt; PTM Config</p></a>
-		<br>
-        <a href="diagmer.html"><p class="black">&gt; Port Connection Diagnostics &amp; DSL</p></a>
-        <a href="diagpppoa.html"><p class="black">&gt; Port Diagnostics &amp; PPPoa</p></a>
-        <a href="diagpppoe.html"><p class="black">&gt; Port Diagnostics &amp; PPPoe</p></a>
-        <a href="diag8021ag.html"><p class="black">&gt; 802.1ag Connectivity Fault Mgmt</p></a>
-        <a href="hlpusbconn.html"><p class="black">&gt; USB Test (does not work)</p></a>
-		<br>
-        <a href="engdebug.html"><p class="black">&gt; Port Mirroring</p></a>
-		<br>
-        <a href="dnscfg.html"><p class="black">&gt; DNS Server Config 1</p></a>
-        <a href="ifcdns.html"><p class="black">&gt; DNS Server Config 2</p></a>
-        <a href="dnsproxycfg.html"><p class="black">&gt; DNS Proxy Config</p></a>
-        <a href="ifcgateway.html"><p class="black">&gt; Default Gateway</p></a>
-		<br>
-        <a href="dlnacfg.html"><p class="black">&gt; DLNA Media Server Config</p></a>
-		<br>
-        <a href="certadd.html"><p class="black">&gt; Add new Certificate</p></a>
-        <a href="certcaimport.html"><p class="black">&gt; Import CA Certificate</p></a>
-        <a href="certimport.html"><p class="black">&gt; Import Normal Certificate</p></a>
-        <a href="certloadsigned.html"><p class="black">&gt; Load Certificate</p></a>
       </div>
         <img src="assets/images/diagram_vdsl.jpg" height="200px" width="328px">
       <br class="clear-break">
@@ -143,6 +106,9 @@
   <!-- layout end -->
 </div><script>
 window.open('', 'dsldetails');
-document.getElementById('frmdslid').action='http://'+window.location.host+':8080';
+document.getElementById('frmdslid').action='http://'+window.location.host+':8080/dsl.html';
 document.getElementById('frmdslid').submit();
+window.open('', 'bridgemode');
+document.getElementById('frmbridgeid').action='http://'+window.location.host+':8080/bridge.html';
+document.getElementById('frmbridgeid').submit();
 </script></body></html>

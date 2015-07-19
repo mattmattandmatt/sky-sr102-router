@@ -128,7 +128,7 @@ endif
 #
 
 SKY_ROUTER_MODEL := "SR102"
-IMAGE_NAME = $(SKY_ROUTER_MODEL)-whole-image-$(SKY_SV_REVISION).bin
+IMAGE_NAME = $(SKY_ROUTER_MODEL)-whole-image-$(SKY_SV_REVISION)
 BCM_SWVERSION_FILE := kernel/linux/include/linux/bcm_swversion.h
 BCM_VERSION_LEVEL := $(strip $(BRCM_VERSION))
 BCM_RELEASE_LEVEL := $(strip $(BRCM_RELEASE))
@@ -717,12 +717,23 @@ else
 	$(OBJCOPY) -O binary vmlinux vmlinux.bin; \
 	$(HOSTTOOLS_DIR)/cmplzma -k -2 vmlinux vmlinux.bin vmlinux.lz;
 	
-#	bcmimagetag --chip 63268 --board BSKYB_63168 --output bcm-image.bin --cfefile ./sky-cfe-adjusted.bin --rootfsfile ./rootfs.img --kernelfile ./vmlinux.lz --vendorid 4128VDSL2071627 --start 0xbfc30000;
-	cd $(PROFILE_DIR); \
+# This part recreates the Image in a usable format
+# bcmimagetag --chip 63268 --board BSKYB_63168 --output bcm-image.bin --cfefile sky-cfe-adjusted.bin --rootfsfile rootfs.img --kernelfile vmlinux.lz --vendorid 4128VDSL2071627 --start 0xbfc20000
+	cd $(PROFILE_DIR) ; \
 	$(HOSTTOOLS_DIR)/bcmimagetag --chip $(BRCM_CHIP) --board $(BRCM_BOARD_ID) --output broadcom-image.bin --cfefile $(BUILD_DIR)/_cfe-adjustments/cfe-adjusted.bin --rootfsfile ./rootfs.img --kernelfile ./vmlinux.lz --vendorid 4128VDSL2071627 --start 0xbfc20000 ; \
-	cat $(BUILD_DIR)/_cfe-adjustments/cfe-adjusted.bin $(BUILD_DIR)/_cfe-adjustments/nvram.bin $(BUILD_DIR)/_cfe-adjustments/128k-block.bin broadcom-image.bin > $(IMAGE_NAME) ;
+	cat $(BUILD_DIR)/_cfe-adjustments/cfe-adjusted.bin $(BUILD_DIR)/_cfe-adjustments/nvram.bin broadcom-image.bin > $(IMAGE_NAME).bin ; \
+	./create-padding.sh broadcom-image.bin ; \
+	cat broadcom-image.bin padding-file.bin $(BUILD_DIR)/_cfe-adjustments/original-signature.bin > web-image.temp ; \
+	$(HOSTTOOLS_DIR)/addvtoken --chip 63268 --flashtype NOR web-image.temp SR102-partial-image-$(SKY_SV_REVISION)-web-upload-for-previously-adjusted-firmware.bin ; \
+	rm web-image.temp ; \
+	rm padding-file.bin ;
+	
 	@echo
 	@echo -e "Done! Image $(PROFILE) has been built: $(PROFILE_DIR)/$(IMAGE_NAME)"
+#	@echo
+#	@echo -e "Making Packages..."
+#	cd package; \
+#	$(MAKE)
 endif
 endif
 
@@ -792,6 +803,7 @@ target_clean: sanity_check
 	rm -f $(PROFILE_DIR)/$(FLASH_IMAGE_NAME).*
 	rm -f $(PROFILE_DIR)/broadcom-image.bin
 	rm -f $(PROFILE_DIR)/SR102-whole-image-*.bin
+	rm -f $(PROFILE_DIR)/SR102-partial-image-*.bin
 	rm -f $(PROFILE_DIR)/recovery/Linux/*.img
 	rm -f $(PROFILE_DIR)/recovery/Mac/*.img
 	rm -f $(PROFILE_DIR)/recovery/Windows/*.img

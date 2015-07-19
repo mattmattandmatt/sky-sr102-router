@@ -8,9 +8,13 @@ In your backup config, there is a command that is avaiable:
 	  <NetworkAccess>LAN</NetworkAccess>
 	</TelnetdCfg>
 
+	<SshdCfg>
+	  <NetworkAccess>LAN</NetworkAccess>
+	</SshdCfg>
+
 	</X_BROADCOM_COM_AppCfg>
   </InternetGatewayDevice>
 </DslCpeConfig>
 
 
-Add TelnetdCfg and Restore the 'Settings', You maybe lucky ?
+Add TelnetdCfg and Restore the 'Settings', You maybe lucky (but unlikely) ?

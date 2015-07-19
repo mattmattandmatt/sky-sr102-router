@@ -1,0 +1,35 @@
+Revision 3766:
+Implemented UnionFS
+
+
+The existing AuxFS used 10% of the Flash and only stored 'dhcp.leases'.  Now it is expanded to use all the avaliable space, approx 6 MiB. It works similar to the OpenWRT overlay, but probably implemented differently.
+
+
+
+
+
+Location:
+---------
+/pivotinit/mnt/root-ro/   = SquashFS   (mtdblock0)
+/pivotinit/mnt/overlay/   = JFFS2      (mtdblock1)
+/pivotinit/mnt/root-rw/   = Combined, and used as the root dir
+
+if you 'delete' a SquashFS file, you can undelete it from the overlay directory.  Deleted files start with '.wh.'
+
+
+
+
+
+Recovery:
+---------
+The normal recovery mode (bootloader): Hold the WPS button while you power on.  Within a few seconds you will have access to the basic web interface to re-flash the stock firmware.
+
+If you delete/change an important bootup file. You can erase the JFFS2 partition during bootup.
+
+The addition recovery mode: Hold the WPS button starting between 5 to 25 seconds after you power on.  When the SkyHD led turns on, it will erase the R/W partition & reboot.
+
+
+
+
+
+Implementation details are in '/etc/init.d/rcS'

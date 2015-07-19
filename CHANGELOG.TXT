@@ -1,3 +1,11 @@
+Revision 3766:
+Implemented UnionFS (read unionFSnotes.txt)
+Added Bridge Mode & Fake Bridge Mode (Advanced > Extras)
+Enabled NFS
+Removed tcpdump
+
+
+
 Revision 3765:
 Restored original Busybox version - due to knock-on BUG
 Added option to change LAN MAC Address

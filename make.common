@@ -21,7 +21,7 @@ SHELL=/bin/bash
 ###########################################
 export SKY_DIAG_SUPPORT:=1
 export BUSY_BOX_TELNET=1
-export BUSY_BOX_NFS_SUPPORT=0
+export BUSY_BOX_NFS_SUPPORT=1
 export BUSY_BOX_VI_SUPPORT=1
 export SKY_TR69_SUPPORT=0
 export BUSY_BOX_TFTP_CLIENT=1

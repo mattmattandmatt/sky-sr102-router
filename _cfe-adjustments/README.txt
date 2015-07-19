@@ -3,7 +3,7 @@ There is no script to automatically adjust the CFE Bootloader, however if you wh
 
 Using the original CFE from SKY-IHR/targets/cfe/bootloader63268.bin_16MB
 
-Extract from Location 0x3894 using 7zip/LZMA decompressor   (You will see a 0x6D000000 Tag)
+Extract from Location 0x3894 using 7zip/LZMA decompressor   (You will see a 0x6D0000 Tag)
 Disassemble it (MIPS Big-Endian) with a starting memory address of 0x80601000   (Address located at 0x3890)
 
 
@@ -25,7 +25,7 @@ Literal context bits (lc):     1
 Literal pos bits (lp):         2
 Number of pos bits (pb):       2
 
-The compressed header should be 0x6D000000, and you will find that the top part of the compressed file is the same as the original cfe.
+The compressed header should be 0x6D0000, and you will find that the top part of the compressed file is the same as the original cfe.
 'SKY-IHR/hostTools/lzma457/CPP/7zip/Compress/LZMA_Alone/lzma' will help.
 Other parameters may work?, but I recommend you only try other options if you have access to eJTAG.
 Normal JTAG does not work, because there is no SAMPLE or EXTEST commands.

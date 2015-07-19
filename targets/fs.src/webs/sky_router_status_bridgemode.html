@@ -1,0 +1,651 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- v4.2 -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Sky Hub &gt; Status</title>
+<link type="text/css" rel="stylesheet" href="assets/css/fonts.css"/>
+<link type="text/css" rel="stylesheet" href="assets/css/main.css"/>
+<!-- jh scripts start -->
+<script type="text/javascript" src="assets/js/libs/jquery/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="assets/js/libs/jquery/jquery.effects.core.js"></script>
+<!--[if LT IE 7]>
+			<script type="text/javascript" src="assets/js/libs/DD_belatedPNG_0.0.8a.js"></script>
+		<![endif]-->
+<script type="text/javascript" src="assets/js/utilities.js"></script>
+<script type="text/javascript" src="assets/js/libs/modernizr.touch.js"></script>
+<script type="text/javascript" src="assets/js/init.js"></script>
+<!-- jh scripts end -->
+<script type="text/javascript" src="assets/js/sky_utility.js"></script>
+<script type="text/javascript" src="assets/js/sky_linux.js"></script>
+<script type="text/javascript" src="assets/js/sky_script.js"></script>
+<script type="text/javascript">
+   <!--// Open Status Window
+var mode='<%ejGet(wanMode)%>';   //ADSL/AUTO WANOE to get the old GUI
+var Router_soft='LOMOND';  //IHR LOMOND to get the old gui -NK
+var empty = '0';
+var syncNvram = '1';
+var wanoeStatus='<%ejGet(Wlinkstat)%>';
+var wanoeparam=wanoeStatus.split('_'); 
+var wanDslLinkConfig = 'Removed_Variable_X_?_?_?_X_?_?_X_?_X'; // it's like: "1_PPPoE_8_32"
+var wanOEstat='<%ejGet(wanoeStatus)%>';
+var Modemstat=wanDslLinkConfig.split('_');
+var wanOEobj=wanOEstat.split('_');
+//var elementWanDslLinkConfig = wanDslLinkConfig.split('_');
+var wlRefreshStatus = '0'; // bug 3520
+var wlRefreshParameters = '0'; // bug 4071
+var dslInterfaceType = Modemstat[9].substring(0,3);
+var sky_ssid = '<%ejGet(Wlssid)%>';
+sky_ssid = sky_ssid.replace(/ /g,"&nbsp;");
+
+var if_allow_submit=false;
+var msg_sky_test="Internet Connection will be interrupted during the test";
+
+function sky_test_function()
+{
+	if (confirm(msg_sky_test))
+	{
+		//if_allow_submit=true;
+		//document.forms[0].submit();
+		 openDataSubWin('sky_stat.html','width=660,height=300,status=yes,resizable=no');
+        //openDataSubWin('sky_stat.html','width=560,height=300,status=yes,resizable=yes');
+	}
+	else
+		return ;
+}
+
+function openStatusWindow()
+{
+	var conn = document.forms[0].wantype.value;
+	var winoptions;
+	if (conn == "dhcp" || conn == "pppoe")
+		winoptions = "width=750,height=350,status=yes,resizable=no";
+	else
+		winoptions = "width=750,height=350,status=yes,resizable=no";
+	openDataSubWin('sky_wanstat.html',winoptions);
+}
+     //-->
+   </script>
+</head>
+<body onload="dataToVisible(document.forms[0]);loadhelp('sstatus_w');">
+<!-- head -->
+<div id="head">
+	<div id="header">
+	<div class="layout"><span id="header-title"><a href="sky_index.html">Sky Hub</a></span><img src="assets/images/sky_logo.png" width="83" height="51" id="header-logo"/> </div>
+	</div>
+	<!-- nav -->
+	<div id="nav">
+	<div id="main-nav">
+	  <div class="layout">
+		<ul id="topmenu">
+		  <li><a id="wireless" href="sky_wireless_settings.html">Wireless</a></li>
+		  <li><a id="security" href="sky_logs.html">Security</a></li>
+		  <li class="selected"><a id="maintenance" href="sky_router_status.html">Maintenance</a></li>
+		  <li><a id="advanced" href="sky_wan_setup.html">Advanced</a></li>
+		  <li><a id="support" href="sky_support.html">Support</a></li>
+		  <li><a id="licence" href="sky_license.html">Licensing Information</a></li>
+		</ul>
+		<a id="logout" href="sky_logout.html">Logout</a> </div>
+	</div>
+	<div id="sub-nav">
+	  <div class="layout">
+		<ul id="submenu-wireless">
+		  <li><a href="sky_wireless_settings.html">Wireless Settings</a></li>
+		  <li><a href="sky_wireless_wps.html">Wireless WPS</a></li>
+		</ul>
+		<ul id="submenu-security">
+		  <li><a href="sky_logs.html">Logs</a></li>
+		  <li><a href="sky_block_sites.html">Block Sites</a></li>
+		  <li><a href="sky_firewall_rules.html">Firewall Rules</a></li>
+		  <li><a href="sky_services.html">Services</a></li>
+		  <li><a href="sky_schedule.html">Schedule</a></li>
+		</ul>
+		<ul id="submenu-maintenance" class="selected">
+		  <li class="selected"><a href="sky_router_status.html">Router Status</a></li>
+		  <li><a href="sky_attached_devices.html">Attached Devices</a></li>
+		  <li><a href="sky_backup_settings.html">Backup Settings</a></li>
+		  <li><a href="sky_set_password.html">Set Password</a></li>
+		  <li><a href="sky_diagnostics.html">Diagnostics</a></li>
+		  <li><a href="sky_router_upgrade.html">Router Upgrade</a></li>
+		</ul>
+		<ul id="submenu-advanced">
+		  <li><a href="sky_wan_setup.html">WAN Setup</a></li>
+		  <li><a href="sky_dynamic_dns.html">Dynamic DNS</a></li>
+		  <li><a href="sky_lan_ip_setup.html">LAN IP Setup</a></li>
+		  <li><a href="sky_remote_management.html">Remote Management</a></li>
+		  <li><a href="sky_upnp.html">UPnP</a></li>
+		</ul>
+		<ul id="submenu-support">
+		</ul>
+	  </div>
+	</div>
+	</div>
+	<!-- nav end -->
+</div>
+<!-- head end -->
+<!-- content -->
+<div id="content">
+	<!-- layout -->
+	<div class="layout">
+	<div id="content-header">
+	  <div id="content-header-copy">
+		<h1>Sky Hub Status</h1>
+		<p class="black">This screen shows the current settings for your Sky Hub. We have preconfigured your Sky Hub with the optimum settings. This is a read only summary page, if you wish to change settings use the menus at the top of this page.</p>
+		<ul>
+		  <li>Select <b>Show Statistics</b> to see your Sky Hub performance statistics such as the number of packets sent and number of packets received for each port</li>
+		  <li>Select <b>Connection Status</b> to see information about your current connection</li>
+		  <li>Sky support team may ask you to click Sky Test and confirm the result if you contact Sky Technical Support</li>
+		</ul>
+	  </div>
+	  <div id="content-header-image"></div>
+	  <br class="clear-break" />
+	</div>
+	<div id="content-body">
+	  <!-- main-panel -->
+	  <div class="main-panel">
+		<hr class="top" />
+		<form name="formname" method="post" action="set.cgi" onsubmit="return if_allow_submit;">
+		  <div class="section-heading">
+			<h3>Systems Details</h3>
+			<a class="help-btn" href="#" name="help1">help</a></div>
+		  <div class="row-holder"> <span class="label w250">Manufacturer</span> <span>
+			<%ejGetOther(sysInfo, Manufacturer)%>
+			</span> </div>
+		  <div class="row-holder"> <span class="label w250">Model</span> <span>
+			<%ejGetOther(sysInfo, Modelname)%>
+			</span> </div>
+		  <div class="row-holder"> <span class="label w250">Firmware Version</span> <span>
+			<%ejGet(sysVersion)%>
+			</span> </div>
+		  <script   type="text/javascript">
+	<!-- hide NK
+		 if((wanOEobj[7]!='WANOE') && (mode=='AUTO' || mode=='ADSL')) {
+			 document.write('<div class="row-holder"> <span class="label w250">DSL Firmware Version</span><span>');
+			 document.write('<%ejGet(dslPhyDrvVersion)%>');
+			 document.write('</span></div>');
+		 }
+
+	// done hiding -->
+	</script>
+		  <hr />
+		  <div class="section-heading">
+			<h3>Modem</h3>
+			<a class="help-btn" href="#" name="help2">help</a></div>
+		  <div class="row-holder"> <span class="label w250">Modem Status</span><span>
+			<script   type="text/javascript">
+			<!-- hide
+			if((Modemstat[0]==1)||('<%ejGetOther(lineRate, 1, 0)%>'!=0)||('<%ejGetOther(lineRate, 0, 0)%>'!=0))
+			document.write("Connected");
+			else if (wanoeparam[0] == 'Connected')
+			document.write("Connected");
+			else
+			document.write("Disconnected");
+			// done hiding -->
+			</script>
+			</span></div>
+		  <script type="text/javascript">
+			<!--hide
+			var buildAtm = '<%ejGetOther(sysInfo, buildAtm)%>';
+			var buildPtm = '<%ejGetOther(sysInfo, buildPtm)%>';
+			var VdslIncluded = '<%ejGetOther(isVdsl, VdslIncluded)%>';
+			var DslBondingEnabled = '<%ejGetOther(isDslBondingEnabled)%>';
+			var temp_mac = '<%ejGetOther(memInfo,routerMacaddr)%>';
+			//var temp_mac="00:19:fb:ff:ff:ff";
+			var mac_adsl = temp_mac.split(':');
+			var last = mac_adsl[mac_adsl.length - 1];
+			var num = parseInt(last, 16);
+			num += 2;
+			last = num.toString(16);
+			if(last.length > 2) {
+				var toNum = mac_adsl[mac_adsl.length - 2] + mac_adsl[mac_adsl.length - 1];
+				var actualOutput = parseInt(toNum, 16) + 2;
+				if(actualOutput.toString(16).length > 3) {
+					var firstDigit = actualOutput.toString(16).substring(0, 2);
+					var secondDigit = actualOutput.toString(16).substring(3, 5);
+				} else {
+					var firstDigit = actualOutput.toString(16).substring(0, 1);
+					var secondDigit = actualOutput.toString(16).substring(2, 3);
+				}
+				if(firstDigit.length < 2) {
+					firstDigit = "0" + firstDigit;
+				}
+				if(secondDigit.length < 2) {
+					last = firstDigit + ":" + "0" + secondDigit;
+				} else {
+					last = firstDigit + ":" + secondDigit;
+				}
+				temp_mac = mac_adsl[0] + ':' + mac_adsl[1] + ':' + mac_adsl[2] + ':' + mac_adsl[3] + ':' + last;
+			} else if(1 == last.length) {
+				last = 0 + last;
+				temp_mac = mac_adsl[0] + ':' + mac_adsl[1] + ':' + mac_adsl[2] + ':' + mac_adsl[3] + ':' + mac_adsl[4] + ':' + last;
+			} else {
+				temp_mac = mac_adsl[0] + ':' + mac_adsl[1] + ':' + mac_adsl[2] + ':' + mac_adsl[3] + ':' + mac_adsl[4] + ':' + last;
+			}
+			//Since WANOE Priority is high , when DSL and WANOE is connected. so disable speed show up
+			if (wanoeparam[0] == 'Connected') {
+				VdslIncluded =0;
+			}
+			if(DslBondingEnabled == 1) {
+				
+				document.write('<div class="row-holder"> <span class="label w250">Traffic Type:</span><span>');
+						 document.write('<%ejGetOther(trafficType, 0)%>');
+						 document.write('</span></div>');
+				document.write('<div class="row-holder"> <span class="label w250">Aggregate Line Rate - Upstream (Kbps):</span><span>');
+						 document.write('<%ejGetOther(lineRate, 0, 0)%>');
+						 document.write('</span></div>');
+				document.write('<div class="row-holder"> <span class="label w250">Aggregate Line Rate - Downstream (Kbps):</span><span>');
+						 document.write('<%ejGetOther(lineRate, 1, 0)%>');
+						 document.write('</span></div>');
+			} else if(VdslIncluded == 1) {
+				document.write('<div class="row-holder"> <span class="label w250">Traffic Type:</span><span>');
+						 document.write('<%ejGetOther(trafficType, 0)%>');
+						 document.write('</span></div>');
+				
+				document.write('<div class="row-holder"> <span class="label w250">Line Rate - Upstream (Kbps):</span><span>');
+						 document.write('<%ejGetOther(lineRate, 0, 0)%>');
+						 document.write('</span></div>');
+			
+				document.write('<div class="row-holder"> <span class="label w250">Line Rate - Downstream (Kbps):</span><span>');
+						 document.write('<%ejGetOther(lineRate, 1, 0)%>');
+						 document.write('</span></div>');
+				//We should show one Traffic Type in Case of VDSL
+				if(buildPtm != 1) {
+				document.write('<div class="row-holder"> <span class="label w250">Traffic Type:</span><span>');
+						 document.write('<%ejGetOther(trafficType, 1)%>');
+						 document.write('</span></div>');
+				
+				document.write('<div class="row-holder"> <span class="label w250">Line Rate - Upstream (Kbps):</span><span>');
+						 document.write('<%ejGetOther(lineRate, 0, 1)%>');
+						 document.write('</span></div>');
+				
+				document.write('<div class="row-holder"> <span class="label w250">Line Rate - Downstream (Kbps):</span><span>');
+						 document.write('<%ejGetOther(lineRate, 1, 1)%>');
+						 document.write('</span></div>');
+				}		 
+						 
+			   
+			
+			} else if(buildAtm == 1 || buildPtm == 1) {
+				document.write('<div class="row-holder"> <span class="label w250">DownStream Connection Speed</span><span>');
+												 if (wanoeparam[0] == 'Connected') {
+							 document.write(wanoeparam[3]);
+												 }
+												 else {
+													 document.write('<%ejGetOther(lineRate, 1, 0)%>');
+												 }
+						 document.write('</span></div>');
+				
+				document.write('<div class="row-holder"> <span class="label w250">UpStream Connection Speed</span><span>');
+												 if (wanoeparam[0] == 'Connected') {
+												 document.write(wanoeparam[2]);
+												 }
+												 else {
+						 document.write('<%ejGetOther(lineRate, 0, 0)%>');
+												 }
+						 document.write('</span></div>');
+
+				if (wanoeparam[0] != 'Connected') {
+				document.write('<div class="row-holder"> <span class="label w250">VPI</span><span>');
+						 document.write(Modemstat[3]);
+						 document.write('</span></div>');
+			
+				document.write('<div class="row-holder"> <span class="label w250">VCI</span><span>');
+						 document.write(Modemstat[4]);
+						 document.write('</span></div>');
+				}
+			}
+			// done hiding -->
+			</script>
+		  <hr />
+		  <div class="section-heading">
+			<h3>Broadband Port</h3>
+			<a class="help-btn" href="#" name="help3">help</a></div>
+		  <script type="text/javascript">
+	<!-- hide NK
+		 if((mode != 'WANOE') && (wanOEobj[7] !='WANOE') ) {
+			 document.write('<div class="row-holder"> <span class="label w250">MAC Address</span><span>');
+			 document.write(temp_mac);
+			 document.write('</span></div>');
+		 }
+		if(((Modemstat[1] != "ipoa") && (wanOEobj[7] =='WANOE') ) || (mode=='WANOE' ) ){
+			Modemstat[1] = wanOEobj[1]; //Network Type
+			Modemstat[5] = wanOEobj[3]; //IP Address
+			Modemstat[7] = wanOEobj[5]; //IP Subnet Mask
+			Modemstat[8] = wanOEobj[6]; //Gateway IP Address
+			Modemstat[10] = wanOEobj[8]; //Domain Name Server
+		}
+		document.write('<div class="row-holder"> <span class="label w250">IP Address</span><span>');
+		document.write(Modemstat[5]);
+		
+		document.write('</span></div>');
+
+		document.write('<div class="row-holder"> <span class="label w250">Network Type</span><span>');
+		
+		switch(Modemstat[1]) {
+		  case "bridge":
+			  document.write("BRIDGE");
+			  break;
+		  case "pppoa":
+			  document.write("PPPoA");
+			  break;
+		  case "pppoe":
+			  document.write("PPPoE");
+			  break;
+		  case "ipoa":
+			  document.write("IPoA");
+			  break;
+		  case "ipoe":
+			  document.write("MER");
+			  break;
+		  default:
+			  document.write("MER/PPPoA");
+		}
+		document.write('</span></div>');
+
+		document.write('<div class="row-holder"> <span class="label w250">IP Subnet Mask</span><span>');
+		document.write(Modemstat[7]);
+		document.write('</span></div>');
+
+		document.write('<div class="row-holder"> <span class="label w250">Gateway IP Address</span><span>');
+		document.write(Modemstat[8]);
+		document.write('</span></div>');
+
+		document.write('<div class="row-holder"> <span class="label w250">Domain Name Server</span><span>');
+		document.write(Modemstat[10]);
+		document.write('</span></div>');
+	// done hiding -->
+	</script>
+		  <script type="text/javascript">
+		  <!-- hide
+		   var wanportStatus='<%ejGet(Wlinkstat)%>';
+		   var wanportnumber=wanportStatus.split('_');
+		   
+		   if((mode=='AUTO') && wanOEobj[7] =='WANOE') // This when AUTO and WANOE is active
+		   {
+				document.write('<hr />');
+				document.write('<div class="section-heading"><h3>WAN Port</h3><a class="help-btn" href="#" name="help4">help</a></div>');
+				
+				document.write('<div class="row-holder"> <span class="label w250">Port Detail</span><span>');
+				document.write("<td> Port "+wanportnumber[1]+"</td>");
+				document.write('</span></div>');
+				
+				document.write('<div class="row-holder"> <span class="label w250">WAN port status</span><span>');
+				document.write(wanportnumber[0]);
+				document.write('</span></div>');			
+
+			}
+			else if(mode=='WANOE') // This is explicit to display WAN port if WANOE is selected
+			{
+				document.write('<hr />');
+				document.write('<div class="section-heading"><h3>WAN Port</h3><a class="help-btn" href="#" name="help4">help</a></div>');
+				
+				document.write('<div class="row-holder"> <span class="label w250">Port Detail</span><span>');
+				document.write("<td> Port "+wanportnumber[1]+"</td>");
+				document.write('</span></div>');
+				
+				document.write('<div class="row-holder"> <span class="label w250">WAN port status</span><span>');
+				document.write(wanportnumber[0]);
+				document.write('</span></div>');
+				  
+	  
+
+		   }
+		  // done hiding -->
+		   </script>
+		  <hr />
+		  <div class="section-heading">
+			<h3>LAN Port</h3>
+			<a class="help-btn" href="#" name="help5">help</a></div>
+		  <script   type="text/javascript">
+		   if(mode !='WANOE'){
+			   
+			   document.write('<div class="row-holder"> <span class="label w250">MAC Address</span><span>');
+				document.write('<%ejGetOther(memInfo,routerMacaddr)%>');
+				document.write('</span></div>');
+		   }
+		  </script>
+		  <div class="row-holder"> <span class="label w250">IP Address</span> <span>
+			<%ejGet(ethIpAddress)%>
+			</span> </div>
+		  <script   type="text/javascript">
+		  <!-- hide
+		  var enblDhcpClnt = '<%ejGet(enblDhcpSrv)%>';
+		  if (enblDhcpClnt == '1') {
+			enblDhcpClnt = 'On';
+		  }
+		  else {
+			enblDhcpClnt = 'Off';
+		  }
+	  
+	   document.write('<div class="row-holder"> <span class="label w250">DHCP</span><span>');
+			  document.write(enblDhcpClnt);
+			  document.write('</span></div>');
+		  // done hiding -->
+		  </script>
+		  <div class="row-holder"> <span class="label w250">IP Subnet Mask</span> <span>
+			<%ejGet(ethSubnetMask)%>
+			</span> </div>
+		  <hr />
+		  <div class="section-heading">
+			<h3>Wireless Port</h3>
+			<a class="help-btn" href="#" name="help6">help</a></div>
+		  <div class="row-holder"> <span class="label w250">Name (SSID)</span> <span>
+			<script   type="text/javascript">
+				document.writeln("<span>" + sky_ssid + "</span>");
+			</script>
+		  </div>
+		  <div class="row-holder"> <span class="label w250">Region</span> <span> Europe </span> </div>
+		  <div class="row-holder"> <span class="label w250">Current Channel</span> <span>
+			<%ejGetWl(wlCurrentChannel)%>
+			</span> </div>
+		  <script type="text/javascript">
+
+		  var enbleAccesspoint = '<%ejGetWl(wlEnbl_wl0v0)%>';
+		  var broadcastName =  '<%ejGetWl(wlHide_wl0v0)%>';
+		  if (enbleAccesspoint == '1') {
+			enbleAccesspoint = 'Enabled';
+		  }
+		  else {
+			enbleAccesspoint = 'Disabled';
+		  }
+		  document.write('<div class="row-holder"> <span class="label w250">Wireless AP</span><span>');
+			  document.write(enbleAccesspoint);
+			  document.write('</span></div>');
+		  
+		  if (broadcastName == '1') {
+			broadcastName = 'Disabled';
+		  }
+		  else {
+			broadcastName = 'Enabled';
+		  }
+		  document.write('<div class="row-holder"> <span class="label w250">Broadcast Name</span><span>');
+			  document.write(broadcastName);
+			  document.write('</span></div>');
+		  // done hiding -->
+		  </script>
+		  <hr />
+		  <div class="section-heading">
+			<h3>Attached Devices</h3>
+			<a class="help-btn" href="#" name="help7">help</a></div>
+		  <script type="text/javascript">
+		  <!-- hide
+		  // done hiding -->
+			var i,j,k,attach_dev='<%ejGet(attacheddev)%>';
+			 var ind_dev=attach_dev.split('<lf>');
+			 var len=ind_dev.length;
+		  var each_line=new Array(len);
+		  if(attach_dev!=' ')
+		  {
+				for(i=0;i<len;i++)
+			   {
+				   each_line[i]=ind_dev[i].split(',');
+			   }
+		  
+				for(i=0;i<len;i++)
+				{
+		  
+			  for(j=0;j<len;j++)
+			  {
+				  if(i==j)
+				  continue;
+				  else if(each_line[i][1]==each_line[j][1])
+				  {
+					   if(each_line[i][0]!=each_line[j][0])
+					   {
+							 if((each_line[i][0]=="UNKNOWN")&&(each_line[j][0]!="UNKNOWN"))
+							  {
+								 each_line[i][0]=each_line[j][0];
+							  each_line[i][1]=each_line[j][1];
+								 each_line[i][2]=each_line[j][2]
+							  }
+					   }
+					   k=j;
+					   len--;
+					   while(k<len)
+					   {
+						   each_line[k][0]=each_line[k+1][0];
+							each_line[k][1]=each_line[k+1][1];
+						   each_line[k][2]=each_line[k+1][2];
+						   k++;
+						}
+				  j=0;
+				  }
+				}
+			}
+		  
+			  for(var j=0;j<len;j++)
+			  {
+				  document.write('<div class="row-holder"> <span class="label w250">'+each_line[j][0]+'</span><span>');
+				  document.write(each_line[j][2]);
+				  document.write('</span></div>');
+			  }
+		  }
+		   </script>
+		  <input name="wantype" value="dhcp" type="hidden"/>
+		  <input name="this_file" value="sky_router_status.html" type="hidden"/>
+		  <input name="next_file" value="sky_router_status.html" type="hidden"/>
+		  <input name="todo" value="sky_test_button" type="hidden"/>
+		  <input name="h_w_channel" value="11" type="hidden"/>
+		</form>
+		<hr />
+		<div class="buttons-holder">
+				<a href="javascript: if_allow_submit=false; openStatusWindow()" class="link">Connection Status</a>
+				<a href="javascript: if_allow_submit=false; openDataSubWin('sky_system.html','width=700,height=660,status=yes,resizable=no');" class="link">Show Statistics</a>
+				<a href="javascript: if_allow_submit=false;sky_test_function()" class="link">Sky Test</a> </div>
+	  </div>
+	  <!-- main-panel end -->
+	  <!-- side-panel -->
+	  <div class="side-panel">
+		<!-- HELP 1 -->
+		<div class="pod pod-help" id="help1"><a href="#close" class="help-close"></a>
+		  <div class="content">
+			<h3>System Details</h3>
+			<p>Basic information about your Sky Hub.</p>
+			<ul>
+			  <li><b>Manufacturer</b> - maker of your Sky Hub.</li>
+			  <li><b>Model</b> - model number.</li>
+			  <li><b>Firmware Version</b> - this is the current software your Sky Hub is using.</li>
+			  <li><b>DSL Firmware Version</b> - This is the version number of the low-level DSL firmware. This is contained within the Sky Hub Firmware.</li>
+			</ul>
+		  </div>
+		  <span class="arrow arrow-l png"></span> </div>
+		<!-- HELP 2 -->
+		<div class="pod pod-help" id="help2"><a href="#close" class="help-close"></a>
+		  <div class="content">
+			<h3>Modem</h3>
+			<p>The current Modem status and settings are shown in this section.</p>
+			<ul>              
+			  <li><b>Modem Status</b> - the current state of the DSL connection to your phone company.</li>
+			  <script type="text/javascript">
+				if( dslInterfaceType == "ptm" )
+				{
+					document.write("<li><b>Traffic Type</b> - this is the current DSL traffic type your Sky Hub is using.</li>");
+					document.write("<li><b>Line Rate - Upstream (Kbps)</b> - the connection speed of the DSL connection from your Sky Hub to the Sky Network.</li>");
+					document.write("<li><b>Line Rate - Downstream (Kbps)</b> - the connection speed of the DSL connection from the Sky Network to your Sky Hub.</li>");
+				}
+				else
+				{
+					document.write("<li><b>DownStream Connection Speed</b> - the connection speed of the DSL connection from the Sky Network to your Sky Hub.</li>");
+					document.write("<li><b>UpStream Connection Speed</b> - the connection speed of the DSL connection from your Sky Hub to the Sky Network.</li>");
+					document.write("<li><b>VPI</b> - Current VPI (Virtual Path Identifier) settings of DSL.</li>");
+					document.write("<li><b>VCI</b> - Current VCI (Virtual Circuit Identifier) settings of DSL.</li>");
+				}
+			  </script>
+			</ul>
+		  </div>
+		  <span class="arrow arrow-l png"></span> </div>
+		<!-- HELP 3 -->
+		<div class="pod pod-help" id="help3"><a href="#close" class="help-close"></a>
+		  <div class="content">
+			<h3>Broadband Port</h3>
+			<p>These are the current DSL settings. We have configured these setting by default for you.</p>
+			<ul>
+			  <li><b>MAC Address</b> - the physical address of the Sky Hub, as seen from the Internet.</li>
+			  <li><b>IP Address</b> - current Internet IP address. If assigned
+				dynamically, and no Internet connection exists, this will be blank or
+				0.0.0.0</li>
+			  <li><b>Network Type</b> - indicates the connection type (e.g. PPPoE, IPoA) used on the DSL port.</li>
+			  <li><b>IP Subnet Mask</b> - the subnet mask associated with the Internet IP address.</li>
+			  <li><b>Gateway IP Address</b> - the Gateway associated with the Internet IP address.</li>
+			  <li><b>Domain Name Server</b> - displays the address of the current DNS.</li>
+			</ul>
+		  </div>
+		  <span class="arrow arrow-l png"></span> </div>
+		<!-- HELP 4 -->
+		<div class="pod pod-help" id="help4"><a href="#close" class="help-close"></a>
+		  <div class="content">
+			<h3>WAN Port</h3>
+			<p>The current WAN status and Port details are shown in this section.</p>
+			<ul>
+			  <li><b>Wan Status</b> - the current state of the WAN connection.</li>
+			  <li><b>Port Detail</b> - Ethernet port number used for WAN connection.</li>
+			</ul>
+		  </div>
+		  <span class="arrow arrow-l png"></span> </div>
+		<!-- HELP 5 -->
+		<div class="pod pod-help" id="help5"><a href="#close" class="help-close"></a>
+		  <div class="content">
+			<h3>LAN Port</h3>
+			<p>These are the current settings, as set in the LAN IP Setup page.</p>
+			<ul>
+			  <li><b>MAC Address</b> - the physical address of the Sky Hub, as seen from the local LAN.</li>
+			  <li><b>IP Address</b> - LAN IP address of the Sky Hub.</li>
+			  <li><b>DHCP</b> - indicates if the Sky Hub is acting as a DHCP Server for devices on your LAN.</li>
+			  <li><b>IP Subnet Mask</b> - subnet mask associated with the LAN IP address.</li>
+			</ul>
+		  </div>
+		  <span class="arrow arrow-l png"></span> </div>
+		<!-- HELP 6 -->
+		<div class="pod pod-help" id="help6"><a href="#close" class="help-close"></a>
+		  <div class="content">
+			<h3>Wireless Port</h3>
+			<p>These are the current settings, as set in the Wireless Settings page.</p>
+			<ul>
+			  <li><b>Name (SSID)</b> - SSID of your Sky Hub.</li>
+			  <li><b>Region</b> - this should be set to Europe.</li>
+			  <li><b>Channel </b>- the current channel in use by your Sky Hub.</li>
+			  <li><b>Wireless AP</b> - indicates if the Access Point feature of your
+				Sky Hub is enabled or not. If not enabled, the Wireless LED on the
+				front panel of your Sky Hub will be off.</li>
+			  <li><b>Broadcast Name</b> - indicates if your Sky Hub is broadcasting its SSID.</li>
+			</ul>
+		  </div>
+		  <span class="arrow arrow-l png"></span> </div>
+		<!-- HELP 7 -->
+		<div class="pod pod-help" id="help7"><a href="#close" class="help-close"></a>
+		  <div class="content">
+			<h3>Attached Devices</h3>
+			<p>This page shows the device name for each device attached to your Sky Hub.</p>
+		  </div>
+		  <span class="arrow arrow-l png"></span> </div>
+	  </div>
+	  <!-- side-panel end -->
+	  <br class="clear-break" />
+	</div>
+	</div>
+	<!-- layout end -->
+</div>
+<!-- content end -->
+</div>
+</body>
+</html>

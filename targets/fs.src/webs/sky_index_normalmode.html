@@ -1,0 +1,311 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- v4.2 -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Sky Hub &gt; Home</title>
+<link type="text/css" rel="stylesheet" href="assets/css/fonts.css"/>
+<link type="text/css" rel="stylesheet" href="assets/css/main.css"/>
+<!-- jh scripts start -->
+<script type="text/javascript" src="assets/js/libs/jquery/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="assets/js/libs/jquery/jquery.effects.core.js"></script>
+<!--[if LT IE 7]>
+			<script type="text/javascript" src="assets/js/libs/DD_belatedPNG_0.0.8a.js"></script>
+		<![endif]-->
+<script type="text/javascript" src="assets/js/utilities.js"></script>
+<script type="text/javascript" src="assets/js/libs/modernizr.touch.js"></script>
+<script type="text/javascript" src="assets/js/init.js"></script>
+<!-- jh scripts end -->
+<script type="text/javascript" src="assets/js/sky_utility.js"></script>
+<script type="text/javascript" src="assets/js/sky_linux.js"></script>
+<script type="text/javascript" src="assets/js/sky_script.js"></script>
+<script type="text/javascript">
+     <!--//
+var msg_restart = "Restarting the Sky Hub will terminate any active connections to the internet";
+var sky_ssid = '<%ejGet(Wlssid)%>';
+sky_ssid = sky_ssid.replace(/ /g,"&nbsp;");
+     //-->
+   </script>
+   <script   type="text/javascript">
+    var logoutEnabled = false;
+      var adminLoggedIp = '<%ejGet(adminLoggedIp)%>';
+      var pcIpAddr = '<%ejGet(pcIpAddr)%>';
+
+      function init()
+      {
+         dataToVisible(document.forms[0]);
+         loadhelp('sstatus_w');
+         loadhelp('_diag');
+         document.getElementById('logout').onclick = function()
+         {
+            if((adminLoggedIp != "") && (adminLoggedIp == pcIpAddr)) {
+                 return true;
+            } else {
+                 return false;
+            }
+         }
+      }
+</script>
+</head>
+<body onload="init();">
+<!-- head -->
+<div id="head">
+  <div id="header">
+    <div class="layout"><span id="header-title"><a href="sky_index.html">Sky Hub</a></span><img src="assets/images/sky_logo.png" width="83" height="51" id="header-logo"/> </div>
+  </div>
+  <!-- nav -->
+  <div id="nav">
+    <div id="main-nav">
+      <div class="layout">
+        <ul id="topmenu">
+          <li><a id="wireless" href="sky_wireless_settings.html">Wireless</a></li>
+          <li><a id="security" href="sky_logs.html">Security</a></li>
+          <li><a id="maintenance" href="sky_router_status.html">Maintenance</a></li>
+          <li><a id="advanced" href="sky_wan_setup.html">Advanced</a></li>
+          <li><a id="support" href="sky_support.html">Support</a></li>
+          <li><a id="licence" href="sky_license.html">Licensing Information</a></li>
+        </ul>
+        <a id="logout" href="sky_logout.html">Logout</a> </div>
+    </div>
+    <div id="sub-nav"  class="hide">
+      <div class="layout">
+        <ul id="submenu-wireless">
+          <li><a href="sky_wireless_settings.html">Wireless Settings</a></li>
+          <li><a href="sky_wireless_wps.html">Wireless WPS</a></li>
+        </ul>
+        <ul id="submenu-security">
+          <li><a href="sky_logs.html">Logs</a></li>
+          <li><a href="sky_block_sites.html">Block Sites</a></li>
+          <li><a href="sky_firewall_rules.html">Firewall Rules</a></li>
+          <li><a href="sky_services.html">Services</a></li>
+          <li><a href="sky_schedule.html">Schedule</a></li>
+        </ul>
+        <ul id="submenu-maintenance">
+          <li><a href="sky_router_status.html">Router Status</a></li>
+          <li><a href="sky_attached_devices.html">Attached Devices</a></li>
+          <li><a href="sky_backup_settings.html">Backup Settings</a></li>
+          <li><a href="sky_set_password.html">Set Password</a></li>
+          <li><a href="sky_diagnostics.html">Diagnostics</a></li>
+          <li><a href="sky_router_upgrade.html">Router Upgrade</a></li>
+        </ul>
+        <ul id="submenu-advanced">
+          <li><a href="sky_wan_setup.html">WAN Setup</a></li>
+          <li><a href="sky_dynamic_dns.html">Dynamic DNS</a></li>
+          <li><a href="sky_lan_ip_setup.html">LAN IP Setup</a></li>
+          <li><a href="sky_remote_management.html">Remote Management</a></li>
+          <li><a href="sky_upnp.html">UPnP</a></li>
+        </ul>
+        <ul id="submenu-support">
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- nav end -->
+</div>
+<!-- head end -->
+<!-- content -->
+<div id="content">
+  <!-- layout -->
+  <div class="layout">
+    <div id="content-header">
+      <div id="content-header-copy">
+        <h1>Summary Status</h1>
+        <p class="black">We configure your Sky Hub with all the settings to enable it to work straight away. Advanced users will find links below to common settings you may wish to change.</p>
+        <p>For more settings select the menu options at the top of this page.</p>
+      </div>
+      <div id="content-header-image"></div>
+      <br class="clear-break" />
+    </div>
+    <div id="content-body">
+      <!-- main-panel -->
+      <div class="main-panel">
+        <hr class="top"/>
+        <form name="formname" method="post" action="sky_rebootinfo.cgi">
+          <div class="section-heading">
+            <h3>Status of your-broadband and wireless network</h3>
+          </div>
+          <div class="row-holder"> <span class="label w250">Broadband</span>
+            <script type="text/javascript">
+				  <!-- hide
+				  var wanDslLinkConfig = '<%ejGet(wanStatus)%>'; // it's like: "1_PPPoE_8_32"
+				  var elementWanDslLinkConfig = wanDslLinkConfig.split('_');
+				  var WanoeStat='<%ejGet(Wlinkstat)%>';
+				  var wanoeparam=WanoeStat.split('_');
+				  var isWanConnected = 'Disconnected';
+				  if(wanoeparam[0]=='Connected') {
+				     isWanConnected='Connected';
+				  }
+				  else if (elementWanDslLinkConfig[0] == '1') {
+					  isWanConnected = 'Connected';
+				  }
+				  document.writeln("<span>" + isWanConnected + "</span>");
+				  // done hiding -->
+             </script>
+          </div>
+          <div class="row-holder"> <span class="label w250">Wireless</span>
+            <script   type="text/javascript">
+				  <!-- hide
+				  var isAPEnabled = 'enable'; // "enable" or "disable"
+				  var enbl = '<%ejGetWl(wlEnbl_wl0v0)%>';
+				  if (enbl == '1') {
+					  isAPEnabled = 'Enabled';
+				  } else {
+					  isAPEnabled = 'Disabled';
+				  }
+				  document.writeln("<span>" + isAPEnabled +"</span>");
+				  -->
+				</script>
+          </div>
+          <div class="row-holder"> <span class="label w250">Wireless Network Name (SSID)</span>
+			<script   type="text/javascript">
+				document.writeln("<span>" + sky_ssid + "</span>");
+			</script>
+		  </div>
+          <div class="row-holder"> <span class="label w250">Wireless Network Visible</span>
+            <script   type="text/javascript">
+				  <!-- hide 
+				  var hide = '<%ejGetWl(wlHide_wl0v0)%>';
+				  var isBCEnabled = 'enable'; // "enable" or "disable"
+				  if (hide== '0') {
+					  isBCEnabled = 'Yes';
+				  } else {
+					  isBCEnabled = 'No';
+				  }
+				  document.writeln("<span>" + isBCEnabled + "</span>");
+				  -->
+			</script>
+          </div>
+          <div class="row-holder"> <span class="label w250">Wireless Channel</span>
+            <script   type="text/javascript">
+				  <!-- hide
+				  var wlChnnel = '<%ejGetWl(wlCurrentChannel)%>';
+				  var wlChnnelStr = wlChnnel.toString();
+				  if (wlChnnel == 0) wlChnnelStr = 'Auto';
+				  document.writeln("<span>" + wlChnnelStr + "</span>");
+				  // done hiding -->
+             </script>
+          </div>
+          <div class="row-holder"> <span class="label w250">Wireless Encryption</span>
+            <script   type="text/javascript">
+				  <!-- hide
+				  var wlAuthMode = '<%ejGetWl(wlAuthMode)%>';
+				  var authModeStr=' ';
+				  var wep = '<%ejGetWl(wlWep)%>';
+				  //
+				  if(wlAuthMode == 'open' && wep=='disabled')
+					  authModeStr = 'None';
+				  else if(wlAuthMode == 'open' && wep=='enabled')
+					  authModeStr = 'WEP Open';
+				  else if(wlAuthMode == 'shared' && wep=='enabled')
+					  authModeStr = 'WEP Shared';
+				  else if(wlAuthMode == 'radius')
+					  authModeStr = '802.1X';
+				  else if(wlAuthMode == 'wpa')
+					  authModeStr = 'WPA';
+				  else if(wlAuthMode == 'psk')
+					  authModeStr = 'WPA-PSK';
+				  else if(wlAuthMode == 'wpa2')
+					  authModeStr = 'WPA2';
+				  else if(wlAuthMode == 'psk2')
+					  authModeStr = 'WPA2 -PSK';
+				  else if(wlAuthMode == 'wpa wpa2')
+					  authModeStr = 'Mixed WPA2/WPA';
+				  else if(wlAuthMode == 'psk psk2')
+					  authModeStr = 'Mixed WPA2/WPA -PSK';
+				  document.writeln("<span>" + authModeStr + "</span>");
+				  // done hiding -->
+			   </script>
+          </div>
+          <hr />
+          <div class="section-heading">
+            <h3>Devices connected to your home network</h3>
+          </div>
+          <table cellpadding="0" cellspacing="0">
+            <tbody>
+              <tr class="header">
+                <td width="35%">Device Name</td>
+                <td>Connection Type</td>
+              </tr>
+              <script type="text/javascript">
+				<!--hide
+				// done hiding -->
+				var i, j, k, attach_dev = '<%ejGet(attacheddev)%>';
+				var ind_dev = attach_dev.split('<lf>');
+				var len = ind_dev.length;
+				var each_line = new Array(len);
+				if(attach_dev != ' ') {
+					for( i = 0; i < len; i++) {
+						each_line[i] = ind_dev[i].split(',');
+					}
+					for( i = 0; i < len; i++) {
+						for( j = 0; j < len; j++) {
+							if(i == j)
+								continue;
+							else if(each_line[i][1] == each_line[j][1]) {
+								if(each_line[i][0] != each_line[j][0]) {
+									if((each_line[i][0] == "UNKNOWN") && (each_line[j][0] != "UNKNOWN")) {
+										each_line[i][0] = each_line[j][0];
+										each_line[i][1] = each_line[j][1];
+										each_line[i][2] = each_line[j][2]
+									}
+								}
+								k = j;
+								len--;
+								while(k < len) {
+									each_line[k][0] = each_line[k+1][0];
+									each_line[k][1] = each_line[k+1][1];
+									each_line[k][2] = each_line[k+1][2];
+									k++;
+								}
+								j = 0;
+							}
+						}
+					}
+					for(var j = 0; j < len; j++) {
+						document.write("<tr>");
+						document.write("<td>" + each_line[j][0] + "</td>");
+						document.write("<td>" + each_line[j][2] + "</td>");
+						document.write("</tr>");
+					}
+				}
+             </script>
+            </tbody>
+          </table>
+          <input name="sessionKey" value="<%ejGetOther(sessionKey)%>" type="hidden"/>
+          <input name="todo" value="sky_test_button" type="hidden"/>
+          <input name="this_file" value="sky_index.html" type="hidden"/>
+          <input name="next_file" value="sky_index.html" type="hidden"/>
+        </form>
+        <hr />
+        <div class="buttons-holder"> <a href="sky_index.html" class="btn42 btn-pink png"><span class="png">Refresh</span></a></div>
+      </div>
+      <!-- main-panel end -->
+      <!-- side-panel -->
+      <div class="side-panel">
+        <div class="pod">
+          <div class="content">
+            <h3>Useful settings</h3>
+            <ul class="clean">
+              <li><a class="link" href="sky_router_status.html">Further Diagnostic Help</a></li>
+              <li><a class="link" href="sky_set_password.html">Change Admin Password</a></li>
+              <li><a class="link" href="sky_wireless_onoff.html">Disable or Enable Wireless Network</a></li>
+              <li><a class="link" href="sky_wireless_network_name.html">Change Wireless Network Name</a></li>
+              <li><a class="link" href="sky_wireless_password.html">Change Wireless Password</a></li>
+              <li><a class="link" href="sky_wireless_channel.html">Change Wireless Channel</a></li>
+              <li><a class="link" href="sky_block_sites.html">Change Parental Controls</a></li>
+              <li><a class="link" href="sky_backup_settings-erase.html">Revert to factory default settings</a></li>
+              <li><a class="link" href="javascript:if(confirm(msg_restart)) window.location.href='sky_rebootCPE.html'">Reboot Sky Hub</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- side-panel end -->
+      <br class="clear-break" />
+    </div>
+  </div>
+  <!-- layout end -->
+</div>
+<!-- content end -->
+</div>
+</body>
+</html>

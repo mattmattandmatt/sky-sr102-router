@@ -224,13 +224,13 @@ CmsImageFormat sky_verifyImageTagAndSignature(const char *imageBuf, UINT32 image
 	*/
 	 // read modulus size from image
 	 modulus_size = *(unsigned int*)((&pub_key[0]) + sizeof(unsigned int));
-		
+	
 	 // get modulus into a BIGD
 	 (void)bdConvFromOctets(modulus,(&pub_key[0]) + sizeof(unsigned int) + sizeof(unsigned int), modulus_size);
-					
+	
 	 // read signature header first
 	 signature_header = *(int*)((imageBuf + (imageLen - (TOKEN_LEN + SKY_IMG_TAG_LEN + SIG_SIZE_FIELD_SIZE))));
-	/*
+	
 	if (MK_SIGNATURE_HEADER != signature_header)
 	{
 		cmsLog_error("INVALID SIGNATURE HEADER\n");
@@ -238,21 +238,21 @@ CmsImageFormat sky_verifyImageTagAndSignature(const char *imageBuf, UINT32 image
 		bdFree(&modulus);
 		return CMS_IMAGE_FORMAT_INVALID;
 	}
-	*/
+	
 	// read signature structure size from image
 	signature_struct_size = *(unsigned int*)((imageBuf + (imageLen - 
 				(TOKEN_LEN + SKY_IMG_TAG_LEN+ SIG_HEADER_FIELD_SIZE + SIG_SIZE_FIELD_SIZE))));
-					
+				
 	// read signature data size
 	signature_data_size = *(unsigned int*)((imageBuf + (imageLen - 
 				(TOKEN_LEN + SKY_IMG_TAG_LEN+ SIG_HEADER_FIELD_SIZE + SIG_SIZE_FIELD_SIZE + signature_struct_size))));
-					
+				
 	// get signature into a BIGD
 	(void)bdConvFromOctets(signature,(const unsigned char *)((imageBuf + imageLen) - 
 				(TOKEN_LEN + SKY_IMG_TAG_LEN + SIG_HEADER_FIELD_SIZE + SIG_SIZE_FIELD_SIZE + (signature_struct_size - SIG_SIZE_FIELD_SIZE))),
 					signature_data_size);
-					
-					
+				
+	
 	if((skyImg.imageType == SKY_IHR_WHOLE_IMAGE) || (skyImg.imageType == SKY_SR102_WHOLE_IMAGE))
 	{
 		unsigned int sectorSize = 0;
@@ -261,7 +261,7 @@ CmsImageFormat sky_verifyImageTagAndSignature(const char *imageBuf, UINT32 image
 		ret = devCtl_boardIoctl(BOARD_IOCTL_FLASH_READ,
 								SECTOR_SIZE,
 								0, 0, 0, &sectorSize);
-										   
+		
 		if (ret != CMSRET_SUCCESS)
 		{
 			cmsLog_error("Failed to read flash sector size");

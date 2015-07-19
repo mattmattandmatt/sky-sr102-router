@@ -8,12 +8,11 @@
 
 /*
 	Added Blocks:
+	mtd-AuxFS - Override values
 	mtd-cfeFS
 	mtd-nvramFS
-	mtd-Spare4FS
 	mtd-LastSectFS
 	mtd-AllFS
-	mtd-TestFS
 */
 
 #include <linux/module.h>
@@ -234,7 +233,7 @@ struct mtd_erase_region_info mercfeFS =
 };
 static struct mtd_info mtdcfeFS =
 {
-	.name		= "BCM63XX CFE/Bootloader",
+	.name		= "BCM63XX CFE",
 	.index		= -1,			/* not registered */
 	.type		= MTD_NORFLASH,
 	.flags		= MTD_CAP_NORFLASH, /* MTD_CLEAR_BITS | MTD_ERASEABLE */
@@ -256,18 +255,18 @@ struct mtd_erase_region_info mernvramFS =
 {
 	.offset = 0,
 	.erasesize = 0x10000,
-	.numblocks = 1
+	.numblocks = 3
 };
 static struct mtd_info mtdnvramFS =
 {
 	.name		= "BCM63XX NVRAM",
-	.index		= -1,			/* not registered */
+	.index		= 3,			/* not registered */
 	.type		= MTD_NORFLASH,
 	.flags		= MTD_CAP_NORFLASH, /* MTD_CLEAR_BITS | MTD_ERASEABLE */
 				/* No SET_BITS, WRITEB_WRITEABLE, MTD_OOB */
 	.numeraseregions = 1,
 	.eraseregions = (struct mtd_erase_region_info*) &mernvramFS,
-	.writesize	= 1,
+	.writesize	= -1,
 	.erasesize	= 0x10000,
 	.read		= bcm63xx_read,
 	.erase		= bcm63xx_erase,
@@ -275,9 +274,9 @@ static struct mtd_info mtdnvramFS =
 	.sync		= bcm63xx_noop,
 	.priv		= (void*) 0xB8010000,
 	.owner		= THIS_MODULE,
-	.size		= 0x10000
+	.size		= 0x30000
 };
-
+/*
 struct mtd_erase_region_info merSpare4FS =
 {
 	.offset = 0,
@@ -286,11 +285,11 @@ struct mtd_erase_region_info merSpare4FS =
 };
 static struct mtd_info mtdSpare4FS =
 {
-	.name		= "BCM63XX Spare 4MB",
-	.index		= -1,			/* not registered */
+	.name		= "BCM63XX Overlay Test",
+	.index		= -1,			// not registered
 	.type		= MTD_NORFLASH,
-	.flags		= MTD_CAP_NORFLASH, /* MTD_CLEAR_BITS | MTD_ERASEABLE */
-				/* No SET_BITS, WRITEB_WRITEABLE, MTD_OOB */
+	.flags		= MTD_CAP_NORFLASH, // MTD_CLEAR_BITS | MTD_ERASEABLE
+				// No SET_BITS, WRITEB_WRITEABLE, MTD_OOB
 	.numeraseregions = 1,
 	.eraseregions	= (struct mtd_erase_region_info*) &merSpare4FS,
 	.writesize	= 1,
@@ -303,7 +302,7 @@ static struct mtd_info mtdSpare4FS =
 	.owner		= THIS_MODULE,
 	.size		= 0x400000,
 };
-
+*/
 struct mtd_erase_region_info merLastSectFS =
 {
 	.offset = 0,
@@ -330,7 +329,7 @@ static struct mtd_info mtdLastSectFS =
 	.size		= 0x10000
 };
 
-struct mtd_erase_region_info merAllFS =
+struct mtd_erase_region_info merallFS =
 {
 	.offset = 0,
 	.erasesize = 0x10000,
@@ -344,7 +343,7 @@ static struct mtd_info mtdAllFS =
 	.flags		= MTD_CAP_NORFLASH, /* MTD_CLEAR_BITS | MTD_ERASEABLE */
 				/* No SET_BITS, WRITEB_WRITEABLE, MTD_OOB */
 	.numeraseregions = 1,
-	.eraseregions	= (struct mtd_erase_region_info*) &merAllFS,
+	.eraseregions	= (struct mtd_erase_region_info*) &merallFS,
 	.writesize	= 1,
 	.erasesize	= 0x10000, // 16777216,
 	.read		= bcm63xx_read,
@@ -356,37 +355,12 @@ static struct mtd_info mtdAllFS =
 	.size		= 16777216,
 };
 
-struct mtd_erase_region_info merTestFS =
-{
-	.offset = 0,
-	.erasesize = 0x10000,
-	.numblocks = 2
-};
-static struct mtd_info mtdTestFS =
-{
-	.name		= "BCM63XX Bits after nvram",
-	.index		= -1,			/* not registered */
-	.type		= MTD_NORFLASH,
-	.flags		= MTD_CAP_NORFLASH, /* MTD_CLEAR_BITS | MTD_ERASEABLE */
-				/* No SET_BITS, WRITEB_WRITEABLE, MTD_OOB */
-	.numeraseregions= 1,
-	.eraseregions = (struct mtd_erase_region_info*) &merTestFS,
-	.writesize	= 1,
-	.erasesize	= 0x10000, // 0x20000,
-	.read		= bcm63xx_read,
-	.erase		= bcm63xx_erase,
-	.write		= bcm63xx_write, 
-	.sync		= bcm63xx_noop,
-	.priv		= (void*) 0xB8020000,
-	.owner		= THIS_MODULE,
-	.size		= 0x20000
-};
 
 
 
 static int __init init_brcm_physmap(void)
 {
-     unsigned int rootfs_addr, kernel_addr;
+     unsigned int rootfs_addr, kernel_addr, kernel_len, auxfs_addr;
 	PFILE_TAG pTag = (PFILE_TAG)NULL;
 
 #ifdef CONFIG_AUXFS_JFFS2
@@ -431,7 +405,7 @@ static int __init init_brcm_physmap(void)
 		printk("Failed to register device mtd[%s]\n", mtdRootFS.name);
 		return -EIO;
 	}
-	
+
 	printk("Registered device mtd[%s] dev[%d] Flash[0x%08x,%llu]\n",
 		mtdRootFS.name, mtdRootFS.index,
 		(int)mtdRootFS.priv, mtdRootFS.size);
@@ -447,7 +421,8 @@ static int __init init_brcm_physmap(void)
 	/*
 	 * Assuming a single eraseregion with all sectors of the same size!!!
 	 */
-	if ( fPartAuxFS.sect_size != 0 ) /* Check assumption */
+	 /*
+	if ( fPartAuxFS.sect_size != 0 ) // Check assumption
 	{
 		mtdAuxFS.priv = (void*)fPartAuxFS.mem_base;
 		mtdAuxFS.size = fPartAuxFS.mem_length;
@@ -459,7 +434,7 @@ static int __init init_brcm_physmap(void)
 		mtdAuxFS.eraseregions->erasesize = fPartAuxFS.sect_size;
 		mtdAuxFS.eraseregions->numblocks = fPartAuxFS.number_blk;
 
-		if ( add_mtd_device( & mtdAuxFS ) ) /*Register Device AuxFS */
+		if ( add_mtd_device( & mtdAuxFS ) ) //Register Device AuxFS
 		{
 			printk("Failed to register device mtd[%s]\n",
 				 mtdAuxFS.name);
@@ -471,54 +446,69 @@ static int __init init_brcm_physmap(void)
 			(int)mtdAuxFS.priv, mtdAuxFS.size);
 
 	}
+	*/
+
+		/* Replacement AuxFS Details */
+
+        kernel_len = (unsigned int) simple_strtoul(pTag->kernelLen, NULL, 10);
+
+		auxfs_addr  = kernel_addr + kernel_len + 0xFFFF;	// Round up Block
+		auxfs_addr /= 0x10000;	// Integer divide
+		auxfs_addr *= 0x10000;
+		mtdAuxFS.priv  = (void*) auxfs_addr;
+
+		//mtdAuxFS.priv = (void*) kernel_addr + kernel_len; // 0xB8000000 +
+		mtdAuxFS.size = 0xB9000000 - auxfs_addr - 0x10000;
+		mtdAuxFS.erasesize = 0x10000;
+
+		mtdAuxFS.numeraseregions = 1;
+		mtdAuxFS.eraseregions->offset = 0;
+		mtdAuxFS.eraseregions->erasesize = 0x10000;
+		mtdAuxFS.eraseregions->numblocks = mtdAuxFS.size / 0x10000;
+
+		if ( add_mtd_device( & mtdAuxFS ) )	// Register Device AuxFS
+		{
+			printk("Failed to register device mtd[%s]\n",
+				 mtdAuxFS.name);
+			return -EIO;
+		}	
+
+		printk("Registered device mtd[%s] dev[%d] Flash[0x%08x,%llu]\n",
+			mtdAuxFS.name, mtdAuxFS.index,
+			(int)mtdAuxFS.priv, mtdAuxFS.size);
+
 #endif
-		
-		
-		
+
+
 		if ( add_mtd_device( &mtdcfeFS ) ) {
 			printk("Failed to register device mtd[%s]\n", mtdcfeFS.name);
 			return -EIO;
 		}
 		printk("Registered device mtd[%s] dev[%d] Flash[0x%08x,%llu]\n",
 			mtdcfeFS.name, mtdcfeFS.index, (int)mtdcfeFS.priv, mtdcfeFS.size);
-		
+
 		if ( add_mtd_device( &mtdnvramFS ) ) {
 			printk("Failed to register device mtd[%s]\n", mtdnvramFS.name);
 			return -EIO;
 		}
 		printk("Registered device mtd[%s] dev[%d] Flash[0x%08x,%llu]\n",
 			mtdnvramFS.name, mtdnvramFS.index, (int)mtdnvramFS.priv, mtdnvramFS.size);
-		
-		if ( add_mtd_device( &mtdSpare4FS ) ) {
-			printk("Failed to register device mtd[%s]\n", mtdSpare4FS.name);
-			return -EIO;
-		}
-		printk("Registered device mtd[%s] dev[%d] Flash[0x%08x,%llu]\n",
-			mtdSpare4FS.name, mtdSpare4FS.index, (int)mtdSpare4FS.priv, mtdSpare4FS.size);
-		
+
 		if ( add_mtd_device( &mtdLastSectFS ) ) {
 			printk("Failed to register device mtd[%s]\n", mtdLastSectFS.name);
 			return -EIO;
 		}
 		printk("Registered device mtd[%s] dev[%d] Flash[0x%08x,%llu]\n",
 			mtdLastSectFS.name, mtdLastSectFS.index, (int)mtdLastSectFS.priv, mtdLastSectFS.size);
-		
+
 		if ( add_mtd_device( &mtdAllFS ) ) {
 			printk("Failed to register device mtd[%s]\n", mtdAllFS.name);
 			return -EIO;
 		}
 		printk("Registered device mtd[%s] dev[%d] Flash[0x%08x,%llu]\n",
 			mtdAllFS.name, mtdAllFS.index, (int)mtdAllFS.priv, mtdAllFS.size);
-		
-		if ( add_mtd_device( &mtdTestFS ) ) {
-			printk("Failed to register device mtd[%s]\n", mtdTestFS.name);
-			return -EIO;
-		}
-		printk("Registered device mtd[%s] dev[%d] Flash[0x%08x,%llu]\n",
-			mtdTestFS.name, mtdTestFS.index, (int)mtdTestFS.priv, mtdTestFS.size);
-		
-		
-		
+
+
 		return 0;
 	}
 

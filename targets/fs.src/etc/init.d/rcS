@@ -1,22 +1,46 @@
 #! /bin/sh
 
+############################################
+# Do Not Adjust this File, this file flips #
+# from read-only to read-write during boot #
+#        Use  /etc/profile  instead        #
+############################################
+
 PATH=/sbin:/bin
 export PATH
 
 
-## Test Remount the rootfs using UnionFS
-#mkdir /var/rootfs-rw
-#mkdir /var/rw
-#mount -t unionfs -o dirs=/var/rw=rw:/dev/root=ro none /var/rootfs-rw/
-#cd /var/rootfs-rw
-#mkdir initx
-#pivot_root . ./initx
-#exec /usr/sbin/chroot . ./sbin/init < ./dev/ttyS0 > ./dev/ttyS0 2>&1
+# Check WPS is pressed to erase Overlay, 5-25 seconds
+FILEOUT="$(dumpmem 0xb0000018 4)"
+WPSVAL=${FILEOUT:41:1}
+if [ $WPSVAL == "d" ]; then
+	echo Failsafe WPS Pressed, erasing mtdblock1 > /dev/console
+	setmem 0xb000009c     0 4   # Kill Watchdog
+	setmem 0xb00000d0 40000 4   # SkyHD Led On
+	sync
+	dd if=/dev/zero ibs=65536 | tr "\000" "\377" > /dev/mtdblock1
+	setmem 0xb00000d0     0 4   # SkyHD Led Off
+	reboot
+	while :
+	do
+		sleep 1
+	done
+fi
 
 
-mount -t proc proc /proc
-/bin/mount -a
+# Remount the rootfs using UnionFS
+mount -t tmpfs -o size=16K tmpfs /mnt
+mkdir /mnt/root-ro /mnt/overlay /mnt/root-rw
+mount -t squashfs /dev/mtdblock0 /mnt/root-ro
+mount -t jffs2    /dev/mtdblock1 /mnt/overlay
+mount -t unionfs -o dirs=/mnt/overlay=rw:/mnt/root-ro=ro none /mnt/root-rw
+mkdir -p /mnt/root-rw/mnt/root-ro /mnt/root-rw/mnt/root-rw
+cd /mnt/root-rw
+mkdir pivotinit 2>/dev/null
+pivot_root . ./pivotinit
+#/usr/sbin/chroot . ./sbin/init < ./dev/ttyS0 > ./dev/ttyS0 2>&1
+
+
+#mount -t proc proc /proc
+mount -a
 #/sbin/inetd
-
-dsldetails 8080 &
-/etc/init.d/runinit2.sh &

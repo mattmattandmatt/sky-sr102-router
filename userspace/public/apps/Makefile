@@ -36,8 +36,8 @@
 # that directory during make and make clean.  (Auto detected directories
 # are listed in the AUTODETECT_SUBDIRS variable.  Type make show_subdirs)
 #
-HARDCODED_SUBDIRS := dhcpv6 sshd ipsec-tools ledctl dhrystone tcpdump \
-                     sendpackets ttcp lsnet dsldetails
+HARDCODED_SUBDIRS := dhcpv6 sshd ipsec-tools ledctl dhrystone \
+                     sendpackets ttcp lsnet dsldetails dhcpbridge
 
 SUBDIRS = $(HARDCODED_SUBDIRS) $(AUTODETECT_SUBDIRS) $(MODSW_SUBDIRS)
 
@@ -184,3 +184,7 @@ lsnet:
 
 dsldetails:
 	$(MAKE) -C $@
+
+dhcpbridge:
+	$(MAKE) -C $@
+
