@@ -1,5 +1,4 @@
 # /etc/profile: system-wide .profile file for the Bourne shells
-echo C > /dev/console
 trap "" 2
 
 export PATH=/opt/bin:/bin:/sbin:/usr/bin:/usr/sbin:/opt/scripts
@@ -11,7 +10,6 @@ KERNELVER=2.6.30
 # change the 0 to the number of seconds, e.g. 300.
 export TMOUT=0
 
-echo D > /dev/console
 echo 
 firsttime=`echo /var/firsttimeru*`
 if [ "$firsttime" = "/var/firsttimeru*" ]; then

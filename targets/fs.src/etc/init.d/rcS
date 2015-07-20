@@ -6,8 +6,11 @@
 #        Use  /etc/profile  instead        #
 ############################################
 
-PATH=/sbin:/bin
+PATH=/sbin:/bin:/usr/bin:/usr/sbin
+LD_LIBRARY_PATH=/lib/private:/lib/public:/lib   # setmem
 export PATH
+export LD_LIBRARY_PATH
+
 
 
 # Check WPS is pressed to erase Overlay, 5-25 seconds
@@ -15,10 +18,11 @@ FILEOUT="$(dumpmem 0xb0000018 4)"
 WPSVAL=${FILEOUT:41:1}
 if [ $WPSVAL == "d" ]; then
 	echo Failsafe WPS Pressed, erasing mtdblock1 > /dev/console
+	echo > /dev/console
 	setmem 0xb000009c     0 4   # Kill Watchdog
 	setmem 0xb00000d0 40000 4   # SkyHD Led On
-	sync
 	dd if=/dev/zero ibs=65536 | tr "\000" "\377" > /dev/mtdblock1
+	sync
 	setmem 0xb00000d0     0 4   # SkyHD Led Off
 	reboot
 	while :
@@ -26,6 +30,7 @@ if [ $WPSVAL == "d" ]; then
 		sleep 1
 	done
 fi
+
 
 
 # Remount the rootfs using UnionFS
