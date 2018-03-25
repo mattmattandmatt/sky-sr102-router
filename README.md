@@ -1,3 +1,6 @@
+# *** Do not use. It causes problems with recent (now old) firmwares ***
+# I might just delete the whole thing, also the Debrick only works with very very earily SR102's. The CPU & PCB are the same, but there might be a difference in the BROM (sort-of microcode) ?.
+
 # Sky Router SR102
 Custom Firmware for the UK black Sky router SR102 - BCM63168<br>
 400Mhz Broadcom CPU, 128MiB RAM, 16MiB SPI Flash<br>
