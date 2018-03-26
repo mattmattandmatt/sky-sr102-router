@@ -1,4 +1,4 @@
-## This mod does not support IPv6, only IPv4. There is more recent source code available but it 'appears' to have an ADSL bug.
+## This mod is old and does not support IPv6, only IPv4. There is more recent source code available but it 'appears' to have an ADSL bug.
 
 # Sky Router SR102
 Custom Firmware for the UK black Sky router SR102 - BCM63168<br>
