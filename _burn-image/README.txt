@@ -1,6 +1,10 @@
 Write Firmware on the Sky Router SR102
 ---------------------------------------
 
+Backup configuration
+Downgrade to the recovery firmware first, by pressing WPS+Reset for a couple of seconds.  This may take a few attempts to upload it.
+
+
 Connect TTL Serial port to pins 1(optional),2,3,4   (or telnet)
  > Refer to the .pdf for Serial Port connection ideas
 Backup current Settings
