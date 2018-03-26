@@ -12,7 +12,7 @@ Header		Port		Name
 9		3		TCK
 8		4		TMS
 7		13		TDO
-
+The I/O reset pulse is the nTRST, so tie that to +V.  Ignore the Master Reset.
 
 
 Start "jtag-win.exe" and type the following:
