@@ -1,7 +1,7 @@
 Write Firmware on the Sky Router SR102
 ---------------------------------------
 
-Backup configuration
+Backup your configuration
 Downgrade to the recovery firmware first, by pressing WPS+Reset for a couple of seconds.  This may take a few attempts to upload it.
 
 
