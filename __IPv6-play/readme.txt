@@ -77,7 +77,7 @@ Run a local mini HTTP server & Connect to the serial port:
 
 This program 'burn-whole-image2' has been tested on only 2 firmwares:
 Oldest 2013 Recovery FW	(2.1m.3173.R)
-Latest 2017 FW			(2.91.2110.R)
+Latest 2017 FW		(2.91.2110.R)
 
 * It expects a file which has a CFE/Bootloader at the beginning *
 
@@ -93,7 +93,7 @@ Latest 2017 FW			(2.91.2110.R)
 Other stuff:
 ------------
 
-If you want to disable IPv6 (for some reason):
+If you want to disable IPv6   (for some reason):
 	sysctl -w net.ipv6.conf.all.disable_ipv6=1
 You can make it apply on every boot by adding that line to:   /data/S61user-exec   (this will have bad side effects)
 
